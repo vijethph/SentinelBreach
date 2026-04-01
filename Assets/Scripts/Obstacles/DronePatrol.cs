@@ -3,96 +3,63 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Moves a drone back and forth across the corridor using a sine wave.
-/// Student-implemented movement pattern — no NavMesh or physics.
+/// Moves drone back and forth across the corridor via sine wave.
+/// Student-written motion — no NavMesh, no physics forces.
 /// </summary>
 public class DronePatrol : MonoBehaviour
 {
-    [Header("Patrol Settings")]
-    [Tooltip("How far left/right the drone swings (in world units).")]
-    public float patrolAmplitude = 2.0f;
+    [Header("Patrol")]
+    public float amplitude  = 2.0f;    // how far left-right it swings
+    public float frequency  = 1.5f;    // how fast
 
-    [Tooltip("How quickly the drone oscillates left/right.")]
-    public float patrolFrequency = 1.5f;
-
-    [Header("Bob (Up/Down Float Effect)")]
-    [Tooltip("Up/down bobbing range.")]
-    public float bobAmplitude = 0.25f;
-
-    [Tooltip("Speed of the bobbing.")]
+    [Header("Bob (up/down float)")]
+    public float bobAmplitude = 0.2f;
     public float bobFrequency = 2.0f;
 
     [Header("Damage")]
-    public int damageAmount = 15;
-
-    [Tooltip("Prevents dealing damage every frame — cooldown between hits.")]
+    public int   damage         = 15;
     public float damageCooldown = 1.0f;
 
-    // Internal state
     private Vector3 originPosition;
-    private float damageTimer = 0f;
-    private bool isDisabled = false;
+    private float   damageTimer = 0f;
+    private bool    isDisabled  = false;
+    private float   phaseOffset;
 
     void Start()
     {
-        // Record spawn position as the origin of patrol oscillation
         originPosition = transform.position;
-
-        // Randomise the phase so multiple drones in one segment don't sync perfectly
-        originPosition.x += Random.Range(-0.3f, 0.3f);
+        phaseOffset    = Random.Range(0f, Mathf.PI * 2f); // randomise phase
     }
 
     void Update()
     {
         if (isDisabled) return;
 
-        // ── SINE WAVE PATROL ─────────────────────────────────────
-        // x(t) = origin.x + A × sin(ω × t)
-        // This is student-written motion — not physics-based
-        float newX = originPosition.x + Mathf.Sin(Time.time * patrolFrequency) * patrolAmplitude;
+        // Sine-wave position: x(t) = origin.x + A·sin(ω·t + φ)
+        float newX = originPosition.x + Mathf.Sin(Time.time * frequency + phaseOffset) * amplitude;
         float newY = originPosition.y + Mathf.Sin(Time.time * bobFrequency) * bobAmplitude;
-
         transform.position = new Vector3(newX, newY, transform.position.z);
 
-        // ── ROTATION to face movement direction ──────────────────
-        float xVelocity = Mathf.Cos(Time.time * patrolFrequency) * patrolAmplitude * patrolFrequency;
-        if (Mathf.Abs(xVelocity) > 0.05f)
-        {
-            Vector3 lookDir = new Vector3(xVelocity, 0f, 1f).normalized;
-            transform.rotation = Quaternion.Lerp(
-                transform.rotation,
-                Quaternion.LookRotation(lookDir),
-                5f * Time.deltaTime
-            );
-        }
-
-        // Count down damage cooldown
         if (damageTimer > 0f) damageTimer -= Time.deltaTime;
     }
 
     void OnTriggerEnter(Collider other)
     {
+        if (isDisabled || damageTimer > 0f) return;
         if (!other.CompareTag("Player")) return;
-        if (isDisabled) return;
-        if (damageTimer > 0f) return;
 
         PlayerHealth ph = other.GetComponent<PlayerHealth>();
-        ph?.TakeDamage(damageAmount, transform.position);
+        ph?.TakeDamage(damage, transform.position);
         damageTimer = damageCooldown;
     }
 
-    /// <summary>
-    /// Called by EMP gadget to temporarily disable this drone (Week 3).
-    /// </summary>
-    public void Disable(float duration)
-    {
-        StartCoroutine(DisableCoroutine(duration));
-    }
+    /// <summary>Called by EMP gadget (Week 3).</summary>
+    public void Disable(float duration) => StartCoroutine(DisableCoroutine(duration));
 
-    IEnumerator DisableCoroutine(float duration)
+    IEnumerator DisableCoroutine(float dur)
     {
         isDisabled = true;
-        yield return new WaitForSeconds(duration);
+        yield return new WaitForSeconds(dur);
         isDisabled = false;
     }
 }

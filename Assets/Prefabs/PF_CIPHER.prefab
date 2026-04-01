@@ -46,8 +46,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8233d90336aea43098adf6dbabd606a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_MeshFormatVersion: 2
   m_Faces:
   - m_Indexes: 000000000100000002000000010000000300000002000000
@@ -246,13 +246,13 @@ MonoBehaviour:
     m_AngleError: 8
     m_AreaError: 15
   m_PreserveMeshAssetOnDestroy: 0
-  assetGuid: 
+  assetGuid:
   m_Mesh: {fileID: 0}
   m_VersionIndex: 941
   m_IsSelectable: 1
-  m_SelectedFaces: 
+  m_SelectedFaces:
   m_SelectedEdges: []
-  m_SelectedVertices: 
+  m_SelectedVertices:
 --- !u!114 &4320039735192983479
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -263,8 +263,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ca002da428252441b92f28d83c8a65f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Shape:
     rid: 7333783929183535130
   m_Size: {x: 0.13, y: 0.52, z: 0.13}
@@ -280,7 +280,7 @@ MonoBehaviour:
     RefIds:
     - rid: 7333783929183535130
       type: {class: Cube, ns: UnityEngine.ProBuilder.Shapes, asm: Unity.ProBuilder}
-      data: 
+      data:
 --- !u!23 &7897376989623015205
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -399,8 +399,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8233d90336aea43098adf6dbabd606a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_MeshFormatVersion: 2
   m_Faces:
   - m_Indexes: 000000000100000002000000010000000300000002000000
@@ -599,13 +599,13 @@ MonoBehaviour:
     m_AngleError: 8
     m_AreaError: 15
   m_PreserveMeshAssetOnDestroy: 0
-  assetGuid: 
+  assetGuid:
   m_Mesh: {fileID: 0}
   m_VersionIndex: 1057
   m_IsSelectable: 1
-  m_SelectedFaces: 
+  m_SelectedFaces:
   m_SelectedEdges: []
-  m_SelectedVertices: 
+  m_SelectedVertices:
 --- !u!114 &3236659212578183333
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -616,8 +616,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ca002da428252441b92f28d83c8a65f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Shape:
     rid: 7333783929183535128
   m_Size: {x: 0.28, y: 0.08, z: 0.02}
@@ -633,7 +633,7 @@ MonoBehaviour:
     RefIds:
     - rid: 7333783929183535128
       type: {class: Cube, ns: UnityEngine.ProBuilder.Shapes, asm: Unity.ProBuilder}
-      data: 
+      data:
 --- !u!23 &6592731055431402544
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -734,7 +734,7 @@ Transform:
   m_GameObject: {fileID: 1231682488908331080}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 5}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -782,8 +782,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2054d78ac9b27814786ffa3a17910e51, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   runSpeed: 8
   laneWidth: 2.5
   laneSwitchSpeed: 10
@@ -803,8 +803,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 91049a7b443641944bba45f6ecc2c77b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   maxHP: 100
   invincibilityDuration: 1.5
 --- !u!1 &2969099426417131052
@@ -853,8 +853,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8233d90336aea43098adf6dbabd606a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_MeshFormatVersion: 2
   m_Faces:
   - m_Indexes: 000000000100000002000000010000000300000002000000
@@ -1053,13 +1053,13 @@ MonoBehaviour:
     m_AngleError: 8
     m_AreaError: 15
   m_PreserveMeshAssetOnDestroy: 0
-  assetGuid: 
+  assetGuid:
   m_Mesh: {fileID: 0}
   m_VersionIndex: 847
   m_IsSelectable: 1
-  m_SelectedFaces: 
+  m_SelectedFaces:
   m_SelectedEdges: []
-  m_SelectedVertices: 
+  m_SelectedVertices:
 --- !u!114 &1237571278368782568
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1070,8 +1070,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ca002da428252441b92f28d83c8a65f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Shape:
     rid: 7333783929183535130
   m_Size: {x: 0.13, y: 0.52, z: 0.13}
@@ -1087,7 +1087,7 @@ MonoBehaviour:
     RefIds:
     - rid: 7333783929183535130
       type: {class: Cube, ns: UnityEngine.ProBuilder.Shapes, asm: Unity.ProBuilder}
-      data: 
+      data:
 --- !u!23 &7671373502815580696
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1206,8 +1206,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8233d90336aea43098adf6dbabd606a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_MeshFormatVersion: 2
   m_Faces:
   - m_Indexes: 000000000100000002000000010000000300000002000000
@@ -1406,13 +1406,13 @@ MonoBehaviour:
     m_AngleError: 8
     m_AreaError: 15
   m_PreserveMeshAssetOnDestroy: 0
-  assetGuid: 
+  assetGuid:
   m_Mesh: {fileID: 0}
   m_VersionIndex: 1124
   m_IsSelectable: 1
-  m_SelectedFaces: 
+  m_SelectedFaces:
   m_SelectedEdges: []
-  m_SelectedVertices: 
+  m_SelectedVertices:
 --- !u!114 &1516646048842735657
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1423,8 +1423,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ca002da428252441b92f28d83c8a65f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Shape:
     rid: 7333783929183535131
   m_Size: {x: 0.18, y: 0.55, z: 0.18}
@@ -1440,7 +1440,7 @@ MonoBehaviour:
     RefIds:
     - rid: 7333783929183535131
       type: {class: Cube, ns: UnityEngine.ProBuilder.Shapes, asm: Unity.ProBuilder}
-      data: 
+      data:
 --- !u!23 &8357230133166112023
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1559,8 +1559,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8233d90336aea43098adf6dbabd606a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_MeshFormatVersion: 2
   m_Faces:
   - m_Indexes: 000000000100000002000000010000000300000002000000
@@ -1759,13 +1759,13 @@ MonoBehaviour:
     m_AngleError: 8
     m_AreaError: 15
   m_PreserveMeshAssetOnDestroy: 0
-  assetGuid: 
+  assetGuid:
   m_Mesh: {fileID: 0}
   m_VersionIndex: 1124
   m_IsSelectable: 1
-  m_SelectedFaces: 
+  m_SelectedFaces:
   m_SelectedEdges: []
-  m_SelectedVertices: 
+  m_SelectedVertices:
 --- !u!114 &5586434278715388684
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1776,8 +1776,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ca002da428252441b92f28d83c8a65f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Shape:
     rid: 7333783929183535131
   m_Size: {x: 0.18, y: 0.55, z: 0.18}
@@ -1793,7 +1793,7 @@ MonoBehaviour:
     RefIds:
     - rid: 7333783929183535131
       type: {class: Cube, ns: UnityEngine.ProBuilder.Shapes, asm: Unity.ProBuilder}
-      data: 
+      data:
 --- !u!23 &7111094106246426947
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1912,8 +1912,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8233d90336aea43098adf6dbabd606a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_MeshFormatVersion: 2
   m_Faces:
   - m_Indexes: 000000000100000002000000010000000300000002000000
@@ -2112,13 +2112,13 @@ MonoBehaviour:
     m_AngleError: 8
     m_AreaError: 15
   m_PreserveMeshAssetOnDestroy: 0
-  assetGuid: 
+  assetGuid:
   m_Mesh: {fileID: 0}
   m_VersionIndex: 1583
   m_IsSelectable: 1
-  m_SelectedFaces: 
+  m_SelectedFaces:
   m_SelectedEdges: []
-  m_SelectedVertices: 
+  m_SelectedVertices:
 --- !u!114 &4976825245399539350
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2129,8 +2129,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ca002da428252441b92f28d83c8a65f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Shape:
     rid: 7333783938048196623
   m_Size: {x: 0.5, y: 0.6, z: 0.28}
@@ -2146,7 +2146,7 @@ MonoBehaviour:
     RefIds:
     - rid: 7333783938048196623
       type: {class: Cube, ns: UnityEngine.ProBuilder.Shapes, asm: Unity.ProBuilder}
-      data: 
+      data:
 --- !u!23 &6212781172205112492
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2266,8 +2266,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8233d90336aea43098adf6dbabd606a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_MeshFormatVersion: 2
   m_Faces:
   - m_Indexes: 000000000100000002000000010000000300000002000000
@@ -2466,13 +2466,13 @@ MonoBehaviour:
     m_AngleError: 8
     m_AreaError: 15
   m_PreserveMeshAssetOnDestroy: 0
-  assetGuid: 
+  assetGuid:
   m_Mesh: {fileID: 0}
   m_VersionIndex: 1527
   m_IsSelectable: 1
-  m_SelectedFaces: 
+  m_SelectedFaces:
   m_SelectedEdges: []
-  m_SelectedVertices: 
+  m_SelectedVertices:
 --- !u!114 &8547977160795961903
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2483,8 +2483,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ca002da428252441b92f28d83c8a65f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Shape:
     rid: 7333783929183535127
   m_Size: {x: 0.35, y: 0.35, z: 0.3}
@@ -2500,7 +2500,7 @@ MonoBehaviour:
     RefIds:
     - rid: 7333783929183535127
       type: {class: Cube, ns: UnityEngine.ProBuilder.Shapes, asm: Unity.ProBuilder}
-      data: 
+      data:
 --- !u!23 &5820893616751649628
 MeshRenderer:
   m_ObjectHideFlags: 0

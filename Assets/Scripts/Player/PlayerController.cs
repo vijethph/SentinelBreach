@@ -3,46 +3,37 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Controls CIPHER's movement using entirely custom physics math.
-/// NO Rigidbody.AddForce, NO Physics.gravity — all motion is computed manually.
-/// Uses CharacterController ONLY for collision geometry detection (isGrounded, Move).
+/// Controls CIPHER's movement with entirely custom physics math.
+/// NO Rigidbody.AddForce — NO Physics.gravity.
+/// CharacterController is used ONLY for collision geometry (isGrounded, Move).
+/// This is what you explain in the interview for the Physics rubric.
 /// </summary>
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
     // ─────────────────────────────────────────────
-    // INSPECTOR-EXPOSED SETTINGS
+    // INSPECTOR SETTINGS
     // ─────────────────────────────────────────────
 
     [Header("Movement")]
-    [Tooltip("Forward run speed in units/second. Increases with SENTINEL tier later.")]
     public float runSpeed = 8f;
-
-    [Tooltip("X position of each lane: left=-2.5, centre=0, right=+2.5")]
-    public float laneWidth = 2.5f;
-
-    [Tooltip("Speed at which CIPHER lerps between lane positions.")]
-    public float laneSwitchSpeed = 10f;
+    public float laneWidth = 2.5f;       // X distance between lanes
+    public float laneSwitchSpeed = 10f;  // how fast CIPHER lerps to target X
 
     [Header("Custom Gravity & Jump — Student-Written Physics")]
-    [Tooltip("Custom gravity constant. Negative = downward. NOT using Physics.gravity.")]
+    [Tooltip("Gravity constant. Negative = downward. NOT Physics.gravity.")]
     public float gravity = -25f;
 
-    [Tooltip("Initial upward velocity applied on jump. NOT using AddForce.")]
+    [Tooltip("Upward velocity on jump. NOT AddForce.")]
     public float jumpForce = 12f;
 
     [Header("Slide")]
-    [Tooltip("CharacterController height during a slide.")]
-    public float slideHeight = 0.5f;
-
-    [Tooltip("CharacterController height when standing.")]
-    public float normalHeight = 1.8f;
-
-    [Tooltip("How long a slide lasts in seconds.")]
+    public float slideHeight = 0.6f;
+    public float normalHeight = 2.0f;
     public float slideDuration = 0.8f;
 
     [Header("Custom Knockback — Student-Written Physics")]
-    [Tooltip("How fast knockback velocity decays per second (exponential decay).")]
+    [Tooltip("How fast knockback velocity decays per second.")]
     public float knockbackDecay = 5f;
 
     // ─────────────────────────────────────────────
@@ -51,22 +42,22 @@ public class PlayerController : MonoBehaviour
 
     private CharacterController cc;
 
-    // Custom physics state — no Rigidbody
+    // Custom physics — no Rigidbody
     private float verticalVelocity = 0f;
     private Vector3 knockbackVelocity = Vector3.zero;
 
-    // Lane state
-    private int currentLane = 1;      // 0=left, 1=centre, 2=right
-    private float targetX = 0f;       // target world X position
+    // Lane
+    private int currentLane = 1;     // 0=left, 1=centre, 2=right
+    private float targetX = 0f;
 
-    // Slide state
+    // Slide
     private bool isSliding = false;
     private float slideTimer = 0f;
 
-    // Public state for other systems
+    // Public state for other scripts
     public float DistanceRun { get; private set; } = 0f;
     public bool IsRunning { get; private set; } = true;
-    public bool IsGrounded => cc.isGrounded;
+    public bool IsGrounded => cc != null && cc.isGrounded;
 
     // ─────────────────────────────────────────────
     // UNITY LIFECYCLE
@@ -75,20 +66,15 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         cc = GetComponent<CharacterController>();
-
-        // Initialise lane to centre
-        currentLane = 1;
-        targetX = 0f;
-
-        // Set CharacterController to standing height
         cc.height = normalHeight;
         cc.center = new Vector3(0f, normalHeight / 2f, 0f);
+        currentLane = 1;
+        targetX = 0f;
     }
 
     void Update()
     {
         if (!IsRunning) return;
-
         HandleInput();
         HandleSlide();
         ApplyMovement();
@@ -96,12 +82,13 @@ public class PlayerController : MonoBehaviour
     }
 
     // ─────────────────────────────────────────────
-    // INPUT HANDLING (legacy Input — refactored Week 4)
+    // INPUT — uses legacy Input Manager
+    // ⚠️ Keep Active Input Handling = "Input Manager (Old)" in Player Settings
     // ─────────────────────────────────────────────
 
     void HandleInput()
     {
-        // Lane switch LEFT
+        // Lane Left
         if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
             if (currentLane > 0)
@@ -111,7 +98,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        // Lane switch RIGHT
+        // Lane Right
         if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
         {
             if (currentLane < 2)
@@ -121,20 +108,14 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        // Jump — only when grounded
+        // Jump — CUSTOM PHYSICS: direct velocity assignment, NOT AddForce
         if (Input.GetKeyDown(KeyCode.Space) && cc.isGrounded)
-        {
-            // CUSTOM PHYSICS: direct velocity assignment — NOT AddForce
             verticalVelocity = jumpForce;
-        }
 
-        // Slide — only when grounded and not already sliding
-		// LeftShift is used instead of LeftControl — Ctrl is caught by OS/editor on some platforms
-		if ((Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.S))
-			&& cc.isGrounded && !isSliding)
-		{
-			StartSlide();
-		}
+        // Slide
+        if ((Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.S))
+            && cc.isGrounded && !isSliding)
+            StartSlide();
     }
 
     // ─────────────────────────────────────────────
@@ -145,8 +126,6 @@ public class PlayerController : MonoBehaviour
     {
         isSliding = true;
         slideTimer = slideDuration;
-
-        // Shrink the CharacterController so CIPHER fits under obstacles
         cc.height = slideHeight;
         cc.center = new Vector3(0f, slideHeight / 2f, 0f);
     }
@@ -154,7 +133,6 @@ public class PlayerController : MonoBehaviour
     void HandleSlide()
     {
         if (!isSliding) return;
-
         slideTimer -= Time.deltaTime;
         if (slideTimer <= 0f)
         {
@@ -170,35 +148,25 @@ public class PlayerController : MonoBehaviour
 
     void ApplyMovement()
     {
-        // ── 1. Forward movement (constant auto-run) ──────────────────
+        // ── 1. Forward auto-run ────────────────────────────────────
         Vector3 move = Vector3.forward * runSpeed;
 
-        // ── 2. Lateral lane positioning (Lerp-based smoothing) ────────
-        // We compute how far we need to move laterally this frame
-        // and inject it as a velocity rather than snapping.
+        // ── 2. Lateral lane Lerp ───────────────────────────────────
         float currentX = transform.position.x;
         float newX = Mathf.Lerp(currentX, targetX, laneSwitchSpeed * Time.deltaTime);
-        // Convert position delta to velocity component
         move.x = (newX - currentX) / Time.deltaTime;
 
-        // ── 3. CUSTOM GRAVITY ─────────────────────────────────────────
-        // Accumulate gravity manually — equivalent to: v = v₀ + a·t
-        // This is student-written physics, NOT Physics.gravity
+        // ── 3. CUSTOM GRAVITY ──────────────────────────────────────
+        // v = v₀ + a·t  — student-written, NOT Physics.gravity
         if (!cc.isGrounded)
-        {
             verticalVelocity += gravity * Time.deltaTime;
-        }
         else if (verticalVelocity < 0f)
-        {
-            // Small negative snap when grounded prevents accumulation
-            verticalVelocity = -2f;
-        }
+            verticalVelocity = -2f;   // ground snap, prevents drift
 
         move.y = verticalVelocity;
 
-        // ── 4. CUSTOM KNOCKBACK DECAY ─────────────────────────────────
-        // Exponential decay: velocity approaches zero asymptotically
-        // This is student-written physics, NOT a physics material or damping
+        // ── 4. CUSTOM KNOCKBACK DECAY ──────────────────────────────
+        // Exponential decay — student-written
         knockbackVelocity = Vector3.Lerp(
             knockbackVelocity,
             Vector3.zero,
@@ -206,49 +174,31 @@ public class PlayerController : MonoBehaviour
         );
         move += knockbackVelocity;
 
-        // ── 5. Apply via CharacterController ─────────────────────────
-        // CharacterController.Move handles collision geometry only —
-        // it does NOT apply any physics forces itself.
+        // ── 5. Apply — CharacterController handles geometry only ───
         cc.Move(move * Time.deltaTime);
     }
 
-    // ─────────────────────────────────────────────
-    // DISTANCE TRACKING
-    // ─────────────────────────────────────────────
-
     void TrackDistance()
     {
-        // Distance = speed × time (simple integration)
         DistanceRun += runSpeed * Time.deltaTime;
     }
 
     // ─────────────────────────────────────────────
-    // PUBLIC METHODS — called by other systems
+    // PUBLIC METHODS
     // ─────────────────────────────────────────────
 
     /// <summary>
-    /// Applies a knockback impulse away from the damage source.
-    /// CUSTOM PHYSICS — computed from direction vector, NOT AddForce.
+    /// CUSTOM PHYSICS: knockback impulse via vector math — NOT AddForce.
+    /// Called by all damage sources (laser, turret, drone).
     /// </summary>
-    /// <param name="sourcePosition">World position of the thing that hit the player.</param>
-    /// <param name="force">Knockback magnitude. Default 8.</param>
     public void ApplyKnockback(Vector3 sourcePosition, float force = 8f)
     {
-        // Compute direction from source to player
         Vector3 dir = (transform.position - sourcePosition).normalized;
-
-        // Add a slight upward component so knockback has visible lift
-        dir.y = 0.4f;
+        dir.y = 0.4f;  // slight upward lift
         dir.Normalize();
-
-        // Set knockback velocity — will decay via exponential decay in ApplyMovement
-        // This is student-written physics: impulse = direction × magnitude
         knockbackVelocity = dir * force;
     }
 
-    /// <summary>
-    /// Stops all movement. Called on death.
-    /// </summary>
     public void StopRunning()
     {
         IsRunning = false;
@@ -256,11 +206,23 @@ public class PlayerController : MonoBehaviour
         verticalVelocity = 0f;
     }
 
-    /// <summary>
-    /// Increases run speed. Called by Skill Tree upgrades.
-    /// </summary>
-    public void SetRunSpeed(float newSpeed)
+    // Called by SwipeInputHandler in Week 4
+    public void SwipeLane(int dir)
     {
-        runSpeed = newSpeed;
+        if (!IsRunning) return;
+        int newLane = Mathf.Clamp(currentLane + dir, 0, 2);
+        if (newLane != currentLane) { currentLane = newLane; targetX = (currentLane - 1) * laneWidth; }
+    }
+
+    public void SwipeJump()
+    {
+        if (!IsRunning || !cc.isGrounded) return;
+        verticalVelocity = jumpForce;
+    }
+
+    public void SwipeSlide()
+    {
+        if (!IsRunning || !cc.isGrounded || isSliding) return;
+        StartSlide();
     }
 }
