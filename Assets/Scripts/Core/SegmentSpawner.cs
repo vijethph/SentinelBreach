@@ -3,80 +3,75 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Spawns corridor segments ahead of the player.
-/// Recycles old segments by moving them to the front.
-/// Keeps 5 segments active at all times.
+/// Spawns corridor segments ahead of the player and destroys old ones behind.
+/// Keeps a rolling queue of active segments to simulate an infinite corridor.
 /// </summary>
 public class SegmentSpawner : MonoBehaviour
 {
-    [Header("References")]
-    [Tooltip("Drag CIPHER (the Player GameObject) here.")]
-    public Transform player;
+    [Header("Segment Prefabs")]
+    [Tooltip("Drag segment prefabs here. Index 0 = open/safe segment.")]
+    public GameObject[] segmentPrefabs;
 
-    // Replace the single segmentPrefab field with an array:
-	[Tooltip("Drag PF_Seg_Open, PF_Seg_Laser, PF_Seg_Turret, PF_Seg_Drone here.")]
-	public GameObject[] segmentPrefabs;
+    [Header("Spawning Config")]
+    [Tooltip("How many segments to keep ahead of the player at all times.")]
+    public int segmentsAhead = 5;
 
-    [Header("Settings")]
-    public int initialSegments = 5;
+    [Tooltip("Length of each segment in Unity units. Must match the prefab Z size.")]
     public float segmentLength = 30f;
 
-    private readonly Queue<GameObject> activeSegments = new Queue<GameObject>();
+    // Internal state
+    private Queue<GameObject> activeSegments = new Queue<GameObject>();
+    private float nextSpawnZ = 0f;
+    private Transform player;
 
     void Start()
     {
-        if (player == null)
+        // Find the player by tag
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj == null)
         {
-            Debug.LogError("SegmentSpawner: Player not assigned!");
+            Debug.LogError("SegmentSpawner: No GameObject with tag 'Player' found!");
             return;
         }
+        player = playerObj.transform;
 
-        float zPos = 0f;
-        for (int i = 0; i < initialSegments; i++)
-        {
-            SpawnSegment(zPos);
-            zPos += segmentLength;
-        }
+        // Pre-fill the corridor with segments
+        for (int i = 0; i < segmentsAhead; i++)
+            SpawnNextSegment();
     }
 
     void Update()
     {
-        if (activeSegments.Count == 0 || player == null) return;
+        if (player == null) return;
 
-        GameObject first = activeSegments.Peek();
-        Transform exit = first.transform.Find("Exit");
+        // Spawn a new segment when the player gets close enough to the end
+        // The threshold: player Z + (look-ahead distance) > where we last spawned
+        while (player.position.z + (segmentsAhead * segmentLength) > nextSpawnZ)
+            SpawnNextSegment();
 
-        if (exit == null)
+        // Destroy segments that are too far behind the player
+        // Keep segmentsAhead + 2 as a buffer before destroying
+        while (activeSegments.Count > segmentsAhead + 2)
         {
-            Debug.LogWarning("SegmentSpawner: Segment has no 'Exit' child.");
+            GameObject old = activeSegments.Dequeue();
+            Destroy(old);
+        }
+    }
+
+    void SpawnNextSegment()
+    {
+        if (segmentPrefabs == null || segmentPrefabs.Length == 0)
+        {
+            Debug.LogError("SegmentSpawner: No segment prefabs assigned!");
             return;
         }
 
-        // When player passes the Exit marker, recycle the oldest segment
-        if (player.position.z > exit.position.z)
-            RecycleSegment();
+        // For Week 1-2: randomly pick from available prefabs
+        // Week 3 will replace this with weighted ScriptableObject selection
+        int index = Random.Range(0, segmentPrefabs.Length);
+        Vector3 spawnPos = new Vector3(0f, 0f, nextSpawnZ);
+        GameObject seg = Instantiate(segmentPrefabs[index], spawnPos, Quaternion.identity);
+        activeSegments.Enqueue(seg);
+        nextSpawnZ += segmentLength;
     }
-
-    // Replace SpawnSegment():
-	void SpawnSegment(float zPos)
-	{
-		if (segmentPrefabs == null || segmentPrefabs.Length == 0) return;
-		// Use open segment for first 2, then random after that
-		int idx = (activeSegments.Count < 2) ? 0 : Random.Range(0, segmentPrefabs.Length);
-		GameObject seg = Instantiate(
-			segmentPrefabs[idx],
-			new Vector3(0f, 0f, zPos),
-			Quaternion.identity
-		);
-		activeSegments.Enqueue(seg);
-	}
-
-    // Replace RecycleSegment():
-	void RecycleSegment()
-	{
-		GameObject first = activeSegments.Dequeue();
-		float newZ = activeSegments.ToArray()[activeSegments.Count - 1].transform.position.z + segmentLength;
-		first.transform.position = new Vector3(0f, 0f, newZ);
-		activeSegments.Enqueue(first);
-	}
 }

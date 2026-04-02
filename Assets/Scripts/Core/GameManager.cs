@@ -85,9 +85,9 @@ public class GameManager : MonoBehaviour
     }
 
     void UpdateShardUI(int total)
-    {
-        if (shardText != null) shardText.text = $"◆ {total}";
-    }
+	{
+		if (shardText != null) shardText.text = $"SHARDS: {total}";
+	}
 
     void HandleDeath()
     {

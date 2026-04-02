@@ -24,11 +24,20 @@ public class PlayerHealth : MonoBehaviour
     private float            invincibleTimer;
 
     void Start()
-    {
-        CurrentHP        = maxHP;
-        playerController = GetComponent<PlayerController>();
-        OnHealthChanged?.Invoke(CurrentHP, maxHP);
-    }
+	{
+		CurrentHP = maxHP;
+		playerController = GetComponent<PlayerController>();
+
+		// ── Apply Shield bonus HP ─────────────────────────────────
+		if (SkillTree.Instance != null)
+		{
+			int bonus = SkillTree.Instance.GetBonusHP();
+			maxHP += bonus;
+			CurrentHP = maxHP;
+		}
+
+		OnHealthChanged?.Invoke(CurrentHP, maxHP);
+	}
 
     void Update()
     {

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c146f9d890168774088fcfbdea3a734a, type: 3}
+  m_Name: SD_Speed
+  m_EditorClassIdentifier: 
+  nodeId: speed
+  displayName: Neural Speed
+  description: Overclock CIPHER's motor implants for faster corridor traversal.
+  costs: 64000000fa000000f4010000
+  levelDescriptions:
+  - +5% run speed
+  - +12% run speed
+  - +20% run speed

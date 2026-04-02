@@ -64,13 +64,19 @@ public class PlayerController : MonoBehaviour
     // ─────────────────────────────────────────────
 
     void Start()
-    {
-        cc = GetComponent<CharacterController>();
-        cc.height = normalHeight;
-        cc.center = new Vector3(0f, normalHeight / 2f, 0f);
-        currentLane = 1;
-        targetX = 0f;
-    }
+	{
+		cc = GetComponent<CharacterController>();
+		currentLane = 1;
+		targetX = 0f;
+		cc.height = normalHeight;
+		cc.center = new Vector3(0f, normalHeight / 2f, 0f);
+
+		// ── Apply Skill Tree bonuses ──────────────────────────────
+		if (SkillTree.Instance != null)
+		{
+			runSpeed *= SkillTree.Instance.GetSpeedMultiplier();
+		}
+	}
 
     void Update()
     {
