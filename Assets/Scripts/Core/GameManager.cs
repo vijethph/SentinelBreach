@@ -90,23 +90,37 @@ public class GameManager : MonoBehaviour
 	}
 
     void HandleDeath()
-    {
-        if (gameOver) return;
-        gameOver = true;
+	{
+		if (gameOver) return;
+		gameOver = true;
 
-        playerController?.StopRunning();
+		playerController.StopRunning();
 
-        float dist = playerController != null ? playerController.DistanceRun : 0f;
-        float best = PlayerPrefs.GetFloat("BestDistance", 0f);
-        if (dist > best) { best = dist; PlayerPrefs.SetFloat("BestDistance", best); PlayerPrefs.Save(); }
+		// ── Commit XP and check level-up ─────────────────────────
+		ProgressionManager.Instance?.CommitXP();
 
-        goDistanceText.text = $"Distance: {dist:F0}m";
-        goBestText.text     = $"Best: {best:F0}m";
-        goScoreText.text    = $"Score: {(int)score:N0}";
+		float dist = playerController.DistanceRun;
+		float best = PlayerPrefs.GetFloat("BestDistance", 0f);
+		if (dist > best) { best = dist; PlayerPrefs.SetFloat("BestDistance", best); }
 
-        gameOverPanel.SetActive(true);
-        hudPanel.SetActive(false);
-    }
+		if (collectibleManager != null && SkillTree.Instance != null)
+			SkillTree.Instance.AddShards(collectibleManager.TotalShards);
+
+		PlayerPrefs.Save();
+
+		// Show current CIPHER level on Game Over screen
+		int cipherLevel = PlayerPrefs.GetInt("CipherLevel", 1);
+		int xpEarned    = ProgressionManager.Instance != null
+			? ProgressionManager.Instance.GetXPEarnedThisRun() : 0;
+
+		goDistanceText.text = $"Distance: {dist:F0}m";
+		goScoreText.text    = $"Score: {(int)score:N0}";
+		goBestText.text     = $"Best: {best:F0}m  |  CIPHER LVL {cipherLevel}  |  +{xpEarned} XP";
+
+		gameOverPanel.SetActive(true);
+		hudPanel.SetActive(false);
+		AudioManager.Instance?.PlayDeath();
+	}
 
     // ─── Button Callbacks ─────────────────────────────────────────
 
@@ -117,8 +131,8 @@ public class GameManager : MonoBehaviour
     }
 
     public void GoToMainMenu()
-    {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); // Main menu added in Week 3
-    }
+	{
+		Time.timeScale = 1f;
+		UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
+	}
 }

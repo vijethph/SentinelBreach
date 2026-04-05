@@ -1,41 +1,35 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
+using System.Linq;
 
 /// <summary>
-/// Spawns corridor segments ahead of the player and destroys old ones behind.
-/// Keeps a rolling queue of active segments to simulate an infinite corridor.
+/// Spawns corridor segments using weighted, distance-aware, SENTINEL-tier-aware selection.
+/// Config weights can also be overridden from JSON in StreamingAssets/segment_config.json.
 /// </summary>
 public class SegmentSpawner : MonoBehaviour
 {
-    [Header("Segment Prefabs")]
-    [Tooltip("Drag segment prefabs here. Index 0 = open/safe segment.")]
-    public GameObject[] segmentPrefabs;
+    [Header("Segment Configs (assign all SegmentConfig SOs)")]
+    public SegmentConfig[] segmentConfigs;
 
     [Header("Spawning Config")]
-    [Tooltip("How many segments to keep ahead of the player at all times.")]
-    public int segmentsAhead = 5;
+    public int   segmentsAhead  = 5;
+    public float segmentLength  = 30f;
 
-    [Tooltip("Length of each segment in Unity units. Must match the prefab Z size.")]
-    public float segmentLength = 30f;
-
-    // Internal state
     private Queue<GameObject> activeSegments = new Queue<GameObject>();
-    private float nextSpawnZ = 0f;
+    private float  nextSpawnZ = 0f;
     private Transform player;
+	private Dictionary<GameObject, ObjectPool<GameObject>> pools
+    = new Dictionary<GameObject, ObjectPool<GameObject>>();
 
     void Start()
     {
-        // Find the player by tag
-        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-        if (playerObj == null)
-        {
-            Debug.LogError("SegmentSpawner: No GameObject with tag 'Player' found!");
-            return;
-        }
-        player = playerObj.transform;
+        player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        if (player == null) { Debug.LogError("SegmentSpawner: No Player found!"); return; }
 
-        // Pre-fill the corridor with segments
+        LoadJSONOverrides();
+
         for (int i = 0; i < segmentsAhead; i++)
             SpawnNextSegment();
     }
@@ -44,34 +38,116 @@ public class SegmentSpawner : MonoBehaviour
     {
         if (player == null) return;
 
-        // Spawn a new segment when the player gets close enough to the end
-        // The threshold: player Z + (look-ahead distance) > where we last spawned
         while (player.position.z + (segmentsAhead * segmentLength) > nextSpawnZ)
             SpawnNextSegment();
 
-        // Destroy segments that are too far behind the player
-        // Keep segmentsAhead + 2 as a buffer before destroying
         while (activeSegments.Count > segmentsAhead + 2)
         {
             GameObject old = activeSegments.Dequeue();
-            Destroy(old);
+            // Destroy(old);
+			ReleaseSegment(old);
         }
     }
 
     void SpawnNextSegment()
-    {
-        if (segmentPrefabs == null || segmentPrefabs.Length == 0)
-        {
-            Debug.LogError("SegmentSpawner: No segment prefabs assigned!");
-            return;
-        }
+	{
+		SegmentConfig chosen = PickWeightedSegment();
+		if (chosen == null || chosen.segmentPrefab == null) return;
 
-        // For Week 1-2: randomly pick from available prefabs
-        // Week 3 will replace this with weighted ScriptableObject selection
-        int index = Random.Range(0, segmentPrefabs.Length);
-        Vector3 spawnPos = new Vector3(0f, 0f, nextSpawnZ);
-        GameObject seg = Instantiate(segmentPrefabs[index], spawnPos, Quaternion.identity);
-        activeSegments.Enqueue(seg);
-        nextSpawnZ += segmentLength;
+		GameObject prefab = chosen.segmentPrefab;
+
+		// Create pool for this prefab if it doesn't exist
+		if (!pools.ContainsKey(prefab))
+		{
+			pools[prefab] = new ObjectPool<GameObject>(
+				createFunc:  () => Instantiate(prefab),
+				actionOnGet: obj => obj.SetActive(true),
+				actionOnRelease: obj => obj.SetActive(false),
+				actionOnDestroy: obj => Destroy(obj),
+				defaultCapacity: 3, maxSize: 10
+			);
+		}
+
+		GameObject seg = pools[prefab].Get();
+		seg.transform.position = new Vector3(0f, 0f, nextSpawnZ);
+		seg.transform.rotation = Quaternion.identity;
+		activeSegments.Enqueue(seg);
+		nextSpawnZ += segmentLength;
+	}
+	
+	void ReleaseSegment(GameObject seg)
+	{
+		// Find the pool this segment came from by its original prefab
+		// Simple approach: return to any pool that manages this type
+		foreach (var kvp in pools)
+		{
+			if (seg.name.StartsWith(kvp.Key.name))
+			{
+				kvp.Value.Release(seg);
+				return;
+			}
+		}
+		Destroy(seg); // fallback
+	}
+
+    SegmentConfig PickWeightedSegment()
+    {
+        float dist = player != null ? player.position.z : 0f;
+        int   tier = SentinelManager.Instance != null ? SentinelManager.Instance.currentTier : 1;
+
+        // Filter to eligible configs
+        var eligible = segmentConfigs
+            .Where(c => c != null && c.segmentPrefab != null
+                        && dist >= c.minDistance
+                        && tier >= c.minSentinelTier)
+            .ToList();
+
+        if (eligible.Count == 0) return segmentConfigs[0]; // fallback to open
+
+        int totalWeight = eligible.Sum(c => c.spawnWeight);
+        int roll = Random.Range(0, totalWeight);
+        int cumulative = 0;
+
+        foreach (var config in eligible)
+        {
+            cumulative += config.spawnWeight;
+            if (roll < cumulative) return config;
+        }
+        return eligible[eligible.Count - 1];
     }
+
+    // ─── JSON Override (expandability embellishment) ───────────────
+
+    void LoadJSONOverrides()
+    {
+        string path = System.IO.Path.Combine(Application.streamingAssetsPath, "segment_config.json");
+        if (!System.IO.File.Exists(path)) return;
+
+        try
+        {
+            string json = System.IO.File.ReadAllText(path);
+            SegmentConfigJSON data = JsonUtility.FromJson<SegmentConfigJSON>(json);
+            if (data == null || data.overrides == null) return;
+
+            foreach (var ov in data.overrides)
+            {
+                foreach (var config in segmentConfigs)
+                {
+                    if (config != null && config.name == ov.configName)
+                    {
+                        config.spawnWeight = ov.spawnWeight;
+                        config.minDistance = ov.minDistance;
+                        Debug.Log($"[SegmentSpawner] JSON override applied: {ov.configName}");
+                    }
+                }
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"[SegmentSpawner] Failed to load JSON config: {e.Message}");
+        }
+    }
+
+    [System.Serializable] class SegmentConfigJSON { public SegmentOverride[] overrides; }
+    [System.Serializable] class SegmentOverride   { public string configName; public int spawnWeight; public float minDistance; }
 }

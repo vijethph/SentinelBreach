@@ -29,6 +29,7 @@ public class CollectibleManager : MonoBehaviour
             case CollectibleType.DataShard:
                 TotalShards += 10;
                 OnShardCollected?.Invoke(TotalShards);
+				AudioManager.Instance?.PlayShard();    // ← ADD THIS
                 break;
             case CollectibleType.ShieldCell:
                 ph?.SetInvincible(true, 3f);

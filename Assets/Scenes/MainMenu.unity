@@ -14,10 +14,10 @@ OcclusionCullingSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 9
-  m_Fog: 0
-  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_Fog: 1
+  m_FogColor: {r: 0.4867924, g: 0.24523313, b: 0.47648937, a: 1}
   m_FogMode: 3
-  m_FogDensity: 0.01
+  m_FogDensity: 0.03
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: ff377b8f34a0d4f4f9037f3f32f70808, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -953,7 +953,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 232210253}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -963,7 +963,7 @@ RectTransform:
   - {fileID: 1499233354}
   - {fileID: 743413578}
   - {fileID: 711097917}
-  m_Father: {fileID: 546112443}
+  m_Father: {fileID: 1287606798}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -1090,7 +1090,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 295455953}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1287606801}
+        m_TargetAssemblyTypeName: SkillTreeUI, Assembly-CSharp
+        m_MethodName: OnUpgradePressed
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: speed
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &295455953
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1344,7 +1356,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 324403158}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1287606801}
+        m_TargetAssemblyTypeName: SkillTreeUI, Assembly-CSharp
+        m_MethodName: OnUpgradePressed
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: shield
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &324403158
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1465,7 +1489,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 392184566}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1287606801}
+        m_TargetAssemblyTypeName: SkillTreeUI, Assembly-CSharp
+        m_MethodName: OnUpgradePressed
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: gadgeteff
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &392184566
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1967,11 +2003,6 @@ RectTransform:
   - {fileID: 2054980849}
   - {fileID: 1376716849}
   - {fileID: 1287606798}
-  - {fileID: 1044729688}
-  - {fileID: 1745922652}
-  - {fileID: 232210254}
-  - {fileID: 1172705298}
-  - {fileID: 1580736452}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2599,7 +2630,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 711097919}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1287606801}
+        m_TargetAssemblyTypeName: SkillTreeUI, Assembly-CSharp
+        m_MethodName: OnUpgradePressed
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: hackrange
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &711097919
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3376,6 +3419,55 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &847821423
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 847821425}
+  - component: {fileID: 847821424}
+  m_Layer: 0
+  m_Name: GadgetManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &847821424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 847821423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00acc0a2bb0f04342b02dc60151a0146, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gadgetData:
+  - {fileID: 11400000, guid: 88808fe85dac4e44193a952354e131e4, type: 2}
+  - {fileID: 11400000, guid: ae042a2f3ba639546a1354a449f1c227, type: 2}
+  - {fileID: 11400000, guid: 1014daf7d103b2548b7fbcbccb4a7349, type: 2}
+  empRadius: 10
+--- !u!4 &847821425
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 847821423}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1096.5741, y: 1053.9257, z: -80.32506}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &894984650
 GameObject:
   m_ObjectHideFlags: 0
@@ -4013,7 +4105,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1044729687}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4023,7 +4115,7 @@ RectTransform:
   - {fileID: 194821494}
   - {fileID: 1306968716}
   - {fileID: 295455951}
-  m_Father: {fileID: 546112443}
+  m_Father: {fileID: 1287606798}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -4361,7 +4453,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1172705297}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4371,7 +4463,7 @@ RectTransform:
   - {fileID: 69057551}
   - {fileID: 154003243}
   - {fileID: 392184564}
-  m_Father: {fileID: 546112443}
+  m_Father: {fileID: 1287606798}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -4434,7 +4526,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1287606798
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4450,6 +4542,11 @@ RectTransform:
   - {fileID: 792515049}
   - {fileID: 800262882}
   - {fileID: 1427752021}
+  - {fileID: 1044729688}
+  - {fileID: 1745922652}
+  - {fileID: 232210254}
+  - {fileID: 1172705298}
+  - {fileID: 1580736452}
   m_Father: {fileID: 546112443}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -4509,35 +4606,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cards:
   - nodeId: speed
-    nameText: {fileID: 0}
-    descText: {fileID: 0}
-    levelText: {fileID: 0}
-    costText: {fileID: 0}
-    upgradeButton: {fileID: 0}
+    nameText: {fileID: 502431000}
+    descText: {fileID: 32665482}
+    levelText: {fileID: 194821495}
+    costText: {fileID: 1306968717}
+    upgradeButton: {fileID: 295455952}
   - nodeId: shield
-    nameText: {fileID: 0}
-    descText: {fileID: 0}
-    levelText: {fileID: 0}
-    costText: {fileID: 0}
-    upgradeButton: {fileID: 0}
+    nameText: {fileID: 2093670820}
+    descText: {fileID: 1079850271}
+    levelText: {fileID: 1778395957}
+    costText: {fileID: 1587104508}
+    upgradeButton: {fileID: 324403157}
   - nodeId: hackrange
-    nameText: {fileID: 0}
-    descText: {fileID: 0}
-    levelText: {fileID: 0}
-    costText: {fileID: 0}
-    upgradeButton: {fileID: 0}
+    nameText: {fileID: 1576144487}
+    descText: {fileID: 1691881310}
+    levelText: {fileID: 1499233355}
+    costText: {fileID: 743413579}
+    upgradeButton: {fileID: 711097918}
   - nodeId: gadgeteff
-    nameText: {fileID: 0}
-    descText: {fileID: 0}
-    levelText: {fileID: 0}
-    costText: {fileID: 0}
-    upgradeButton: {fileID: 0}
+    nameText: {fileID: 588556272}
+    descText: {fileID: 922094619}
+    levelText: {fileID: 69057552}
+    costText: {fileID: 154003244}
+    upgradeButton: {fileID: 392184565}
   - nodeId: knockbackres
-    nameText: {fileID: 0}
-    descText: {fileID: 0}
-    levelText: {fileID: 0}
-    costText: {fileID: 0}
-    upgradeButton: {fileID: 0}
+    nameText: {fileID: 183624778}
+    descText: {fileID: 533952311}
+    levelText: {fileID: 1877844326}
+    costText: {fileID: 1470130084}
+    upgradeButton: {fileID: 1687041842}
   shardBalanceText: {fileID: 0}
 --- !u!1 &1306968715
 GameObject:
@@ -5250,7 +5347,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1427752023}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1531572153}
+        m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
+        m_MethodName: OnCloseUpgradesPressed
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1427752023
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5587,7 +5696,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelBadgeText: {fileID: 751049887}
-  skillTreePanel: {fileID: 0}
+  skillTreePanel: {fileID: 1287606797}
 --- !u!4 &1531572154
 Transform:
   m_ObjectHideFlags: 0
@@ -5764,7 +5873,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1580736451}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5774,7 +5883,7 @@ RectTransform:
   - {fileID: 1877844325}
   - {fileID: 1470130083}
   - {fileID: 1687041841}
-  m_Father: {fileID: 546112443}
+  m_Father: {fileID: 1287606798}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -6035,7 +6144,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1687041843}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1287606801}
+        m_TargetAssemblyTypeName: SkillTreeUI, Assembly-CSharp
+        m_MethodName: OnUpgradePressed
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: knockbackres
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1687041843
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6233,7 +6354,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1745922651}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -6243,7 +6364,7 @@ RectTransform:
   - {fileID: 1778395956}
   - {fileID: 1587104507}
   - {fileID: 324403156}
-  m_Father: {fileID: 546112443}
+  m_Father: {fileID: 1287606798}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -6834,3 +6955,4 @@ SceneRoots:
   - {fileID: 546112443}
   - {fileID: 843257916}
   - {fileID: 1531572154}
+  - {fileID: 847821425}

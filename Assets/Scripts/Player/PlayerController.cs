@@ -41,6 +41,10 @@ public class PlayerController : MonoBehaviour
     // ─────────────────────────────────────────────
 
     private CharacterController cc;
+	
+	// ── Input System ─────────────────────────────────────────────
+	private CipherInputActions inputActions;
+	private Vector2 moveInput;
 
     // Custom physics — no Rigidbody
     private float verticalVelocity = 0f;
@@ -77,6 +81,23 @@ public class PlayerController : MonoBehaviour
 			runSpeed *= SkillTree.Instance.GetSpeedMultiplier();
 		}
 	}
+	
+	void OnEnable()
+	{
+		inputActions = new CipherInputActions();
+		inputActions.Player.Enable();
+
+		inputActions.Player.Jump.performed  += ctx => OnJump();
+		inputActions.Player.Slide.performed += ctx => OnSlide();
+		inputActions.Player.Gadget1.performed += ctx => GadgetManager.Instance?.Activate(0);
+		inputActions.Player.Gadget2.performed += ctx => GadgetManager.Instance?.Activate(1);
+		inputActions.Player.Gadget3.performed += ctx => GadgetManager.Instance?.Activate(2);
+	}
+
+	void OnDisable()
+	{
+		inputActions?.Player.Disable();
+	}
 
     void Update()
     {
@@ -93,36 +114,45 @@ public class PlayerController : MonoBehaviour
     // ─────────────────────────────────────────────
 
     void HandleInput()
-    {
-        // Lane Left
-        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            if (currentLane > 0)
-            {
-                currentLane--;
-                targetX = (currentLane - 1) * laneWidth;
-            }
-        }
+	{
+		if (inputActions == null) return;
 
-        // Lane Right
-        if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            if (currentLane < 2)
-            {
-                currentLane++;
-                targetX = (currentLane - 1) * laneWidth;
-            }
-        }
+		moveInput = inputActions.Player.Move.ReadValue<Vector2>();
 
-        // Jump — CUSTOM PHYSICS: direct velocity assignment, NOT AddForce
-        if (Input.GetKeyDown(KeyCode.Space) && cc.isGrounded)
-            verticalVelocity = jumpForce;
+		// Lane switch — only trigger on direction change, not held
+		// We use a flag to prevent repeated triggers while key is held
+		float horizontal = moveInput.x;
+		if (horizontal < -0.5f && !laneMoving)
+		{
+			if (currentLane > 0) { currentLane--; targetX = (currentLane - 1) * laneWidth; }
+			laneMoving = true;
+		}
+		else if (horizontal > 0.5f && !laneMoving)
+		{
+			if (currentLane < 2) { currentLane++; targetX = (currentLane - 1) * laneWidth; }
+			laneMoving = true;
+		}
+		else if (Mathf.Abs(horizontal) < 0.1f)
+		{
+			laneMoving = false;
+		}
+	}
 
-        // Slide
-        if ((Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.S))
-            && cc.isGrounded && !isSliding)
-            StartSlide();
-    }
+	private bool laneMoving = false;
+
+	void OnJump()
+	{
+		if (!IsRunning) return;
+		if (cc.isGrounded)
+			verticalVelocity = jumpForce;
+	}
+
+	void OnSlide()
+	{
+		if (!IsRunning) return;
+		if (cc.isGrounded && !isSliding)
+			StartSlide();
+	}
 
     // ─────────────────────────────────────────────
     // SLIDE
@@ -213,22 +243,52 @@ public class PlayerController : MonoBehaviour
     }
 
     // Called by SwipeInputHandler in Week 4
-    public void SwipeLane(int dir)
-    {
-        if (!IsRunning) return;
-        int newLane = Mathf.Clamp(currentLane + dir, 0, 2);
-        if (newLane != currentLane) { currentLane = newLane; targetX = (currentLane - 1) * laneWidth; }
-    }
+    // public void SwipeLane(int dir)
+    // {
+    //     if (!IsRunning) return;
+    //     int newLane = Mathf.Clamp(currentLane + dir, 0, 2);
+    //     if (newLane != currentLane) { currentLane = newLane; targetX = (currentLane - 1) * laneWidth; }
+    // }
 
-    public void SwipeJump()
-    {
-        if (!IsRunning || !cc.isGrounded) return;
-        verticalVelocity = jumpForce;
-    }
+    // public void SwipeJump()
+    // {
+    //     if (!IsRunning || !cc.isGrounded) return;
+    //     verticalVelocity = jumpForce;
+    // }
 
-    public void SwipeSlide()
-    {
-        if (!IsRunning || !cc.isGrounded || isSliding) return;
-        StartSlide();
-    }
+    // public void SwipeSlide()
+    // {
+    //     if (!IsRunning || !cc.isGrounded || isSliding) return;
+    //     StartSlide();
+    // }
+	
+		// ─── Called by SwipeInputHandler (Android) ──────────────────
+
+	/// <summary>Swipe left (dir=-1) or right (dir=+1) to change lane.</summary>
+	public void SwipeLane(int dir)
+	{
+		if (!IsRunning) return;
+		int newLane = Mathf.Clamp(currentLane + dir, 0, 2);
+		if (newLane != currentLane)
+		{
+			currentLane = newLane;
+			targetX = (currentLane - 1) * laneWidth;
+		}
+	}
+
+	/// <summary>Swipe up — jump.</summary>
+	public void SwipeJump()
+	{
+		if (!IsRunning) return;
+		if (cc.isGrounded)
+			verticalVelocity = jumpForce;
+	}
+
+	/// <summary>Swipe down — slide.</summary>
+	public void SwipeSlide()
+	{
+		if (!IsRunning) return;
+		if (cc.isGrounded && !isSliding)
+			StartSlide();
+	}
 }

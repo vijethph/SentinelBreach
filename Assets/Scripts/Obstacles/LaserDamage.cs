@@ -17,7 +17,10 @@ public class LaserDamage : MonoBehaviour
         {
             PlayerHealth ph = other.GetComponent<PlayerHealth>();
             if (ph != null)
+			{
                ph.TakeDamage(damageAmount, transform.position);
+			   AudioManager.Instance?.PlayLaser();
+			}
         }
     }
 }

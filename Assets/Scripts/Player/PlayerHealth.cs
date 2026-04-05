@@ -53,10 +53,13 @@ public class PlayerHealth : MonoBehaviour
         if (IsInvincible) return;
 
         CurrentHP = Mathf.Max(0, CurrentHP - amount);
+		// In TakeDamage(), after currentHP is reduced:
+		QuestManager.Instance?.NotifyDamageTaken();
         OnHealthChanged?.Invoke(CurrentHP, maxHP);
 
         // Delegate knockback to custom physics
         playerController?.ApplyKnockback(sourcePosition);
+		AudioManager.Instance?.PlayHit();
 
         IsInvincible    = true;
         invincibleTimer = invincibilityDuration;
