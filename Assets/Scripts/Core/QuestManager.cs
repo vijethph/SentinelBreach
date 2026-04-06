@@ -179,6 +179,7 @@ public class QuestManager : MonoBehaviour
         SkillTree.Instance?.AddShards(q.shardBonus);
         OnQuestCompleted?.Invoke(q.xpReward);
         OnProgressUpdated?.Invoke(slot, q.targetCount, q.targetCount);
+		QuestPopup.Instance?.ShowCompletion(q);
     }
 
     // ─── Getters for QuestUI ──────────────────────────────────────

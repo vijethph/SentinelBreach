@@ -33,6 +33,7 @@ public class GadgetManager : MonoBehaviour
 
     // How many slots are currently unlocked (level-gated)
     private int unlockedSlots = 3;   // starts with 1; CIPHER level unlocks more
+	public int TotalGadgetsUsed { get; private set; } = 0;
 
     // ─────────────────────────────────────────────────────────────
 
@@ -96,6 +97,8 @@ public class GadgetManager : MonoBehaviour
             case "timeslow":  ExecuteTimeSlow(data.duration); break;
             default: Debug.LogWarning($"Unknown gadget id: {data.gadgetId}"); return;
         }
+		
+		TotalGadgetsUsed++;
 		
 		// In Activate(), after the switch statement:
 		QuestManager.Instance?.NotifyGadgetUsed(data.gadgetId);

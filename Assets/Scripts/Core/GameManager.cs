@@ -26,12 +26,16 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI distanceText;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI shardText;
+	public TextMeshProUGUI hpPercentText; 
 
     [Header("UI — Game Over")]
     public GameObject      gameOverPanel;
     public TextMeshProUGUI goDistanceText;
     public TextMeshProUGUI goBestText;
     public TextMeshProUGUI goScoreText;
+	public TextMeshProUGUI goShardsText;     
+	public TextMeshProUGUI goGadgetsText;    
+	public TextMeshProUGUI goCipherLevelText; 
 
     private PlayerController   playerController;
     private PlayerHealth       playerHealth;
@@ -39,6 +43,10 @@ public class GameManager : MonoBehaviour
 
     private float score    = 0f;
     private bool  gameOver = false;
+	
+	// ─── Run Tracking ─────────────────────────────────────────────
+	private int shardsThisRun   = 0;
+	private int gadgetsUsedThisRun = 0;
 
     void Start()
     {
@@ -63,6 +71,10 @@ public class GameManager : MonoBehaviour
         gameOverPanel.SetActive(false);
         hudPanel.SetActive(true);
         Application.targetFrameRate = 60;
+		
+		// After existing subscriptions, add:
+		if (collectibleManager != null)
+			collectibleManager.OnShardCollected += _ => shardsThisRun = collectibleManager.TotalShards;
     }
 
     void Update()
@@ -77,12 +89,20 @@ public class GameManager : MonoBehaviour
     // ─── Event Handlers ──────────────────────────────────────────
 
     void UpdateHealthBar(int current, int max)
-    {
-        if (healthBarFill == null) return;
-        float ratio = (float)current / max;
-        healthBarFill.fillAmount = ratio;
-        healthBarFill.color = Color.Lerp(Color.red, new Color(0f, 0.86f, 0.31f), ratio);
-    }
+	{
+		if (healthBarFill == null) return;
+
+		// Drive the fill amount — this makes the bar shrink
+		float ratio = max > 0 ? (float)current / max : 0f;
+		healthBarFill.fillAmount = ratio;
+
+		// Colour shift: green at full HP → red at zero HP
+		healthBarFill.color = Color.Lerp(Color.red, new Color(0f, 0.86f, 0.31f), ratio);
+
+		// Update percentage text if assigned
+		if (hpPercentText != null)
+			hpPercentText.text = $"{Mathf.RoundToInt(ratio * 100f)}%";
+	}
 
     void UpdateShardUI(int total)
 	{
@@ -99,23 +119,26 @@ public class GameManager : MonoBehaviour
 		// ── Commit XP and check level-up ─────────────────────────
 		ProgressionManager.Instance?.CommitXP();
 
-		float dist = playerController.DistanceRun;
+		float dist = playerController != null ? playerController.DistanceRun : 0f;
 		float best = PlayerPrefs.GetFloat("BestDistance", 0f);
 		if (dist > best) { best = dist; PlayerPrefs.SetFloat("BestDistance", best); }
+
+		ProgressionManager.Instance?.CommitXP();
 
 		if (collectibleManager != null && SkillTree.Instance != null)
 			SkillTree.Instance.AddShards(collectibleManager.TotalShards);
 
 		PlayerPrefs.Save();
 
-		// Show current CIPHER level on Game Over screen
 		int cipherLevel = PlayerPrefs.GetInt("CipherLevel", 1);
-		int xpEarned    = ProgressionManager.Instance != null
-			? ProgressionManager.Instance.GetXPEarnedThisRun() : 0;
+		int xpEarned    = ProgressionManager.Instance?.GetXPEarnedThisRun() ?? 0;
 
 		goDistanceText.text = $"Distance: {dist:F0}m";
+		goBestText.text     = $"Best: {best:F0}m";
 		goScoreText.text    = $"Score: {(int)score:N0}";
-		goBestText.text     = $"Best: {best:F0}m  |  CIPHER LVL {cipherLevel}  |  +{xpEarned} XP";
+		goShardsText.text   = $"Shards: {collectibleManager?.TotalShards ?? 0}";
+		goGadgetsText.text  = $"Gadgets used: {GadgetManager.Instance?.TotalGadgetsUsed ?? 0}";
+		goCipherLevelText.text = $"CIPHER LVL {cipherLevel}  |  +{xpEarned} XP";
 
 		gameOverPanel.SetActive(true);
 		hudPanel.SetActive(false);

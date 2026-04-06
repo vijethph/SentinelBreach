@@ -14,7 +14,20 @@ public class Collectible : MonoBehaviour
 
     private Vector3 startPos;
 
-    void Start() { startPos = transform.position; }
+	void Start()
+	{
+		startPos = transform.position;
+		// Switch to continuous detection so fast-moving CIPHER
+		// doesn't clip through the trigger without registering
+		Rigidbody rb = GetComponent<Rigidbody>();
+		if (rb == null)
+		{
+			rb = gameObject.AddComponent<Rigidbody>();
+			rb.isKinematic = true;   // collectible doesn't move physically
+			rb.useGravity  = false;
+			rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+		}
+	}
 
     void Update()
     {

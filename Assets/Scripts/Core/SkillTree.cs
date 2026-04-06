@@ -14,10 +14,18 @@ public class SkillTree : MonoBehaviour
     public static SkillTree Instance { get; private set; }
 
     void Awake()
-    {
-        if (Instance == null) { Instance = this; DontDestroyOnLoad(gameObject); }
-        else Destroy(gameObject);
-    }
+	{
+		if (Instance == null)
+		{
+			Instance = this;
+			DontDestroyOnLoad(gameObject); 
+		}
+		else
+		{
+			Destroy(gameObject);  // destroy duplicate if scene reloaded
+			return;
+		}
+	}
 
     // ─── Inspector ───────────────────────────────────────────────
     [Header("Skill Data Assets (assign all 5)")]
