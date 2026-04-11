@@ -82,4 +82,18 @@ public class LaserGridController : MonoBehaviour
         yield return new WaitForSeconds(dur);
         StartCoroutine(ToggleRoutine());
     }
+	
+	/// <summary>Disable the laser for duration seconds (called by Ghost Chip).</summary>
+	public void GhostDisable(float duration)
+	{
+		StopAllCoroutines();
+		SetBeam(false);
+		StartCoroutine(ReEnableAfter(duration));
+	}
+
+	IEnumerator ReEnableAfter(float duration)
+	{
+		yield return new WaitForSeconds(duration);
+		StartCoroutine(ToggleRoutine());
+	}
 }

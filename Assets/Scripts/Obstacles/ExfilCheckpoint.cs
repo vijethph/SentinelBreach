@@ -25,8 +25,10 @@ public class ExfilCheckpoint : MonoBehaviour
 		}
 
 		BoxCollider bc = gameObject.AddComponent<BoxCollider>();
+		if (bc == null) bc = gameObject.AddComponent<BoxCollider>();
 		bc.isTrigger = true;
 		bc.size = new Vector3(5f, 4f, 1f);
+		bc.center = Vector3.zero;
 	}
 
     void OnTriggerEnter(Collider other)

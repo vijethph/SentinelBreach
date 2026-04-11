@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Movement")]
     public float runSpeed = 8f;
-    public float laneWidth = 2.5f;       // X distance between lanes
+    public float laneWidth = 2.0f;       // X distance between lanes
     public float laneSwitchSpeed = 10f;  // how fast CIPHER lerps to target X
 
     [Header("Custom Gravity & Jump — Student-Written Physics")]

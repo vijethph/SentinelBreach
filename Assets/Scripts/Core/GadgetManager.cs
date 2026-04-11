@@ -199,4 +199,40 @@ public class GadgetManager : MonoBehaviour
         slot < onCooldown.Length && onCooldown[slot];
 
     public bool IsUnlocked(int slot) => slot < unlockedSlots;
+	
+	/// <summary>
+	/// Called when a Surge Token is collected.
+	/// Gradually refills all gadget cooldowns by reducing their remaining timers.
+	/// </summary>
+	public void StartSurgeRefill(float refillDuration = 3f)
+	{
+		StartCoroutine(SurgeRefillCoroutine(refillDuration));
+	}
+
+	IEnumerator SurgeRefillCoroutine(float duration)
+	{
+		Debug.Log("[GadgetManager] Surge Token: refilling gadget cooldowns.");
+		float elapsed = 0f;
+
+		while (elapsed < duration)
+		{
+			elapsed += Time.deltaTime;
+			float tickReduction = Time.deltaTime * (1f / duration); // fraction per frame
+
+			for (int i = 0; i < cooldownTimers.Length; i++)
+			{
+				if (cooldownTimers[i] > 0f)
+				{
+					// Reduce the timer proportionally so all cooldowns drain toward 0
+					cooldownTimers[i] = Mathf.Max(0f,
+						cooldownTimers[i] - tickReduction * GetMaxCooldown(i));
+
+					if (cooldownTimers[i] <= 0f)
+						onCooldown[i] = false;
+				}
+			}
+			yield return null;
+		}
+		Debug.Log("[GadgetManager] Surge refill complete.");
+	}
 }

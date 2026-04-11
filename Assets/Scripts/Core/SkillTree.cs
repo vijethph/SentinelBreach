@@ -118,11 +118,15 @@ public class SkillTree : MonoBehaviour
     /// <summary>Reads total shards from PlayerPrefs (persisted across scenes).</summary>
     public int GetTotalShards() => PlayerPrefs.GetInt("TotalShards", 0);
 
-    /// <summary>Adds shards and saves immediately.</summary>
-    public void AddShards(int amount)
-    {
-        int total = GetTotalShards() + amount;
-        PlayerPrefs.SetInt("TotalShards", total);
-        PlayerPrefs.Save();
-    }
+    /// <summary>
+	/// Adds shards and persists. Called by quest rewards and other bonuses.
+	/// NOT called for normal shard pickups — those save directly in CollectibleManager.
+	/// </summary>
+	public void AddShards(int amount)
+	{
+		if (amount <= 0) return;
+		int current = PlayerPrefs.GetInt("TotalShards", 0);
+		PlayerPrefs.SetInt("TotalShards", current + amount);
+		PlayerPrefs.Save();
+	}
 }

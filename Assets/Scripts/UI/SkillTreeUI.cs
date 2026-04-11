@@ -39,7 +39,7 @@ public class SkillTreeUI : MonoBehaviour
 
         int shards = SkillTree.Instance.GetTotalShards();
         if (shardBalanceText != null)
-            shardBalanceText.text = $"◆ {shards}";
+            shardBalanceText.text = $"SHARDS: {shards}";
 
         foreach (var card in cards)
         {
@@ -57,7 +57,7 @@ public class SkillTreeUI : MonoBehaviour
                 card.descText.text = maxed ? "MAX LEVEL" : data.levelDescriptions[level];
 
             if (card.costText)
-                card.costText.text = maxed ? "—" : $"Cost: {data.costs[level]} ◆";
+                card.costText.text = maxed ? "—" : $"Cost: {data.costs[level]} Shards";
 
             if (card.upgradeButton)
             {

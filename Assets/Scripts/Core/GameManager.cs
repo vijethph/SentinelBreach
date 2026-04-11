@@ -113,6 +113,10 @@ public class GameManager : MonoBehaviour
 	{
 		if (gameOver) return;
 		gameOver = true;
+		
+		// Disable pause input when game is over
+		if (PauseManager.Instance != null)
+			PauseManager.Instance.enabled = false;
 
 		playerController.StopRunning();
 
@@ -125,8 +129,8 @@ public class GameManager : MonoBehaviour
 
 		ProgressionManager.Instance?.CommitXP();
 
-		if (collectibleManager != null && SkillTree.Instance != null)
-			SkillTree.Instance.AddShards(collectibleManager.TotalShards);
+		// if (collectibleManager != null && SkillTree.Instance != null)
+		//	SkillTree.Instance.AddShards(collectibleManager.TotalShards);
 
 		PlayerPrefs.Save();
 

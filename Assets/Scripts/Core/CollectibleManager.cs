@@ -28,19 +28,35 @@ public class CollectibleManager : MonoBehaviour
         {
             case CollectibleType.DataShard:
                 TotalShards += 10;
+				int runningTotal = PlayerPrefs.GetInt("TotalShards", 0) + 10;
+				PlayerPrefs.SetInt("TotalShards", runningTotal);
+				PlayerPrefs.Save();
+
                 OnShardCollected?.Invoke(TotalShards);
 				AudioManager.Instance?.PlayShard();    // ← ADD THIS
                 break;
             case CollectibleType.ShieldCell:
-                ph?.SetInvincible(true, 3f);
-                OnShieldCollected?.Invoke();
-                break;
+                // Activate the visible shield sphere and grant invincibility
+				ShieldEffect shieldEffect = player.GetComponent<ShieldEffect>();
+				if (shieldEffect != null)
+					shieldEffect.ActivateShield();
+				else
+					ph?.SetInvincible(true, 5f);  // fallback if ShieldEffect not found
+
+				OnShieldCollected?.Invoke();
+				Debug.Log("[Collectible] Shield Cell collected — shield activated.");
+				break;
             case CollectibleType.SurgeToken:
-                OnSurgeCollected?.Invoke();
-                break;
+                // Gradually refills all gadget cooldowns over 3 seconds
+				GadgetManager.Instance?.StartSurgeRefill(3f);
+				OnSurgeCollected?.Invoke();
+				Debug.Log("[Collectible] Surge Token collected — gadget cooldowns refilling.");
+				break;
             case CollectibleType.GhostChip:
-                OnGhostChipCollected?.Invoke();
-                break;
+				GhostChipEffect.Instance?.ActivateGhostMode();
+				OnGhostChipCollected?.Invoke();
+				Debug.Log("[Collectible] Ghost Chip collected — ghost mode active.");
+				break;
         }
     }
 }
