@@ -120,9 +120,6 @@ public class GameManager : MonoBehaviour
 
 		playerController.StopRunning();
 
-		// ── Commit XP and check level-up ─────────────────────────
-		ProgressionManager.Instance?.CommitXP();
-
 		float dist = playerController != null ? playerController.DistanceRun : 0f;
 		float best = PlayerPrefs.GetFloat("BestDistance", 0f);
 		if (dist > best) { best = dist; PlayerPrefs.SetFloat("BestDistance", best); }

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   questId: empenemies
   description: Use EMP with 3+ enemies active
-  questType: 0
+  questType: 7
   targetCount: 1
   xpReward: 50
   shardBonus: 25

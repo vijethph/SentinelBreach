@@ -32,7 +32,7 @@ public class GadgetManager : MonoBehaviour
     private PlayerController playerController;
 
     // How many slots are currently unlocked (level-gated)
-    private int unlockedSlots = 3;   // starts with 1; CIPHER level unlocks more
+    private int unlockedSlots = 1;   // starts with 1; CIPHER level unlocks more
 	public int TotalGadgetsUsed { get; private set; } = 0;
 
     // ─────────────────────────────────────────────────────────────
