@@ -22,6 +22,13 @@ public class PlayerHealth : MonoBehaviour
 
     private PlayerController playerController;
     private float            invincibleTimer;
+	
+	[Header("Hit Effects")]
+	[Tooltip("Drag HitParticles prefab here.")]
+	public GameObject hitParticlePrefab;
+
+	[Tooltip("Knockback force applied on every hit.")]
+	public float knockbackForce = 10f;
 
     void Start()
 	{
@@ -50,7 +57,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(int amount, Vector3 sourcePosition)
     {
-        if (IsInvincible) return;
+        if (IsInvincible || CurrentHP <= 0) return;
 
         CurrentHP = Mathf.Max(0, CurrentHP - amount);
 		// In TakeDamage(), after currentHP is reduced:
@@ -58,7 +65,25 @@ public class PlayerHealth : MonoBehaviour
         OnHealthChanged?.Invoke(CurrentHP, maxHP);
 
         // Delegate knockback to custom physics
-        playerController?.ApplyKnockback(sourcePosition);
+        if (sourcePosition != default)
+			playerController?.ApplyKnockback(sourcePosition, knockbackForce);
+		
+		GetComponentInChildren<Animator>()
+        ?.SetTrigger(Animator.StringToHash("hitTrigger"));
+		
+		CameraShake.Instance?.Shake();
+		DamageFlash.Instance?.TriggerFlash();
+		GetComponent<HitFlash>()?.Flash();
+		
+		if (hitParticlePrefab != null)
+		{
+			Vector3 spawnPos = sourcePosition != default
+				? sourcePosition
+				: transform.position;
+			GameObject burst = Instantiate(hitParticlePrefab, spawnPos, Quaternion.identity);
+			Destroy(burst, 1f);
+		}
+	
 		AudioManager.Instance?.PlayHit();
 
         IsInvincible    = true;

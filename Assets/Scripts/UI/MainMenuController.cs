@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using TMPro;
 
 public class MainMenuController : MonoBehaviour
@@ -9,16 +10,30 @@ public class MainMenuController : MonoBehaviour
     [Header("UI References")]
     public TextMeshProUGUI levelBadgeText;
     public GameObject skillTreePanel;   // assign in Inspector after building it below
+	
+	[Header("XP Bar")]
+	public Image           xpBarFill;
+	public TextMeshProUGUI xpProgressText;
 
     void Start()
     {
-        // Show persisted CIPHER level
-        int level = PlayerPrefs.GetInt("CipherLevel", 1);
-        if (levelBadgeText != null)
-            levelBadgeText.text = $"LVL {level}";
+        int level   = PlayerPrefs.GetInt("CipherLevel", 1);
+		int totalXP = PlayerPrefs.GetInt("CipherXP", 0);
 
-        if (skillTreePanel != null)
-            skillTreePanel.SetActive(false);
+		if (levelBadgeText) levelBadgeText.text = $"LVL {level}";
+
+		// XP bar fill
+		int[] thresholds = { 0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700 };
+		if (level <= thresholds.Length)
+		{
+			int prevXP = thresholds[level - 1];
+			int nextXP = level < thresholds.Length ? thresholds[level] : thresholds[thresholds.Length - 1];
+			float fill = nextXP > prevXP ? (float)(totalXP - prevXP) / (nextXP - prevXP) : 1f;
+			if (xpBarFill)     xpBarFill.fillAmount = Mathf.Clamp01(fill);
+			if (xpProgressText) xpProgressText.text = $"{totalXP - prevXP} / {nextXP - prevXP} XP";
+		}
+
+		if (skillTreePanel) skillTreePanel.SetActive(false);
     }
 
     public void OnPlayPressed()

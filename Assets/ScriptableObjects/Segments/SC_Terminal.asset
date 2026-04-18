@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: SC_Terminal
   m_EditorClassIdentifier: 
   segmentPrefab: {fileID: 6123985111690105267, guid: 4a66cd3c2cd6f174a90c888121d9811a, type: 3}
-  spawnWeight: 20
-  minDistance: 300
+  spawnWeight: 30
+  minDistance: 200
   minSentinelTier: 2

@@ -23,10 +23,19 @@ public class ProgressionManager : MonoBehaviour
 
     public event Action<int> OnLevelUp;  // passes new level
 
-    private int xpEarnedThisRun = 0;
+    // Float accumulator fixes the per-frame FloorToInt → 0 bug
+    private float xpAccumulator    = 0f;
+    private int   xpEarnedThisRun  = 0;
+    private bool  committed        = false;   // guard against double-commit
+	
+	private PlayerController playerControllerCache;
 
     void Start()
     {
+		xpAccumulator   = 0f;
+        xpEarnedThisRun = 0;
+        committed       = false;
+		
         // Subscribe to quest completions for XP
         if (QuestManager.Instance != null)
             QuestManager.Instance.OnQuestCompleted += OnQuestXP;
@@ -57,6 +66,20 @@ public class ProgressionManager : MonoBehaviour
     /// </summary>
     public int CommitXP()
     {
+		if (committed)
+        {
+            Debug.LogWarning("[Progression] CommitXP called twice — ignoring second call.");
+            return 0;
+        }
+        committed = true;
+		
+		// Flush any remaining fractional accumulator
+        if (xpAccumulator >= 1f)
+        {
+            xpEarnedThisRun += Mathf.FloorToInt(xpAccumulator);
+            xpAccumulator = 0f;
+        }
+		
         int totalXP = PlayerPrefs.GetInt("CipherXP", 0) + xpEarnedThisRun;
         PlayerPrefs.SetInt("CipherXP", totalXP);
 

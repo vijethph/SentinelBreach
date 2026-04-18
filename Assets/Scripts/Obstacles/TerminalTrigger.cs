@@ -16,6 +16,10 @@ public class TerminalTrigger : MonoBehaviour
         if (triggered) return;
         if (!other.CompareTag("Player")) return;
         triggered = true;
+		
+		// Show narrative choice UI
+        if (NarrativeChoiceUI.Instance != null)
+            NarrativeChoiceUI.Instance.ShowChoice();
 
         QuestManager.Instance?.NotifyExfilReached(); // reuses exfil notification for quest
         ProgressionManager.Instance?.OnExfilReached();

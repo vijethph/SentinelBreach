@@ -37,4 +37,13 @@ public class SentinelManager : MonoBehaviour
 		if (playerController != null) playerController.runSpeed += speedBonusPerTier;
 		AudioManager.Instance?.IncreaseMusicPitch();    // ← ADD THIS
 	}
+	
+	/// <summary>Applied by STEALTH narrative choice — reduces turret rotation speed.</summary>
+	public void ApplyStealthModifier()
+	{
+		foreach (var turret in FindObjectsOfType<TurretController>())
+			turret.rotationSpeed = Mathf.Max(turret.rotationSpeed - 4f, 2f);
+
+		Debug.Log("[Sentinel] Stealth modifier: turret tracking slowed.");
+	}
 }

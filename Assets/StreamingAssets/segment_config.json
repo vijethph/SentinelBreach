@@ -1,10 +1,10 @@
 {
   "overrides": [
-    { "configName": "SC_Open",     "spawnWeight": 60, "minDistance": 0   },
+    { "configName": "SC_Open",     "spawnWeight": 10, "minDistance": 0   },
     { "configName": "SC_Laser",    "spawnWeight": 40, "minDistance": 100 },
     { "configName": "SC_Turret",   "spawnWeight": 30, "minDistance": 200 },
     { "configName": "SC_Drone",    "spawnWeight": 30, "minDistance": 150 },
-    { "configName": "SC_Terminal", "spawnWeight": 20, "minDistance": 300 },
-    { "configName": "SC_Exfil",    "spawnWeight": 5,  "minDistance": 500 }
+    { "configName": "SC_Terminal", "spawnWeight": 30, "minDistance": 200 },
+    { "configName": "SC_Exfil",    "spawnWeight": 10,  "minDistance": 500 }
   ]
 }

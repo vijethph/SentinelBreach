@@ -48,6 +48,11 @@ public class GadgetManager : MonoBehaviour
 
         // Apply Gadget Efficiency skill tree bonus
         // (SkillTree reads from PlayerPrefs, which persists from MainMenu scene)
+		int savedLevel = PlayerPrefs.GetInt("CipherLevel", 1);
+		unlockedSlots = 1;  // always start from 1, apply perks sequentially
+
+		if (savedLevel >= 2) UnlockSlot(1);
+		if (savedLevel >= 5) UnlockSlot(2);
     }
 
     void Update()
@@ -175,11 +180,19 @@ public class GadgetManager : MonoBehaviour
     /// <summary>Called by ProgressionManager when CIPHER reaches level 2 or 5.</summary>
     public void UnlockSlot(int slot)
     {
-        if (slot < gadgetData.Length)
-        {
-            unlockedSlots = Mathf.Max(unlockedSlots, slot + 1);
-            Debug.Log($"[GadgetManager] Slot {slot} unlocked.");
-        }
+		
+		if (slot >= (gadgetData?.Length ?? 3)) return;
+		if (slot < unlockedSlots) return;  // already unlocked
+
+		unlockedSlots = Mathf.Max(unlockedSlots, slot + 1);
+
+		string name = (gadgetData != null && slot < gadgetData.Length && gadgetData[slot] != null)
+			? gadgetData[slot].displayName
+			: $"Gadget {slot + 1}";
+
+		Debug.Log($"[GadgetManager] Slot {slot} ({name}) unlocked.");
+		// Notify GadgetUI to refresh lock overlays
+		GadgetUI.Instance?.RefreshLockState();
     }
 
     // ─── Getters for UI ──────────────────────────────────────────

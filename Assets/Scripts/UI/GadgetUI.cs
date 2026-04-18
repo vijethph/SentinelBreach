@@ -149,4 +149,11 @@ public class GadgetUI : MonoBehaviour
         if (slot < slots.Length && slots[slot] != null)
             slots[slot].flashTimer = flashDuration;
     }
+	
+	public void RefreshLockState()
+	{
+		// Force the next Update() to re-evaluate locked state
+		// (Update already reads IsUnlocked() — calling this just logs the refresh)
+		Debug.Log("[GadgetUI] Lock state refreshed.");
+	}
 }

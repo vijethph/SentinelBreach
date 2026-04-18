@@ -96,4 +96,12 @@ public class LaserGridController : MonoBehaviour
 		yield return new WaitForSeconds(duration);
 		StartCoroutine(ToggleRoutine());
 	}
+	
+	/// <summary>Applied by STEALTH narrative choice — slows the beam timing for this run.</summary>
+	public void ApplyStealthTiming()
+	{
+		offDuration = Mathf.Min(offDuration + 0.8f, 3.5f);
+		onDuration  = Mathf.Max(onDuration  - 0.3f, 0.5f);
+		Debug.Log("[LaserGrid] Stealth timing applied.");
+	}
 }

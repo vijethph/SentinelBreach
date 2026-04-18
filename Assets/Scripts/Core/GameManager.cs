@@ -124,15 +124,15 @@ public class GameManager : MonoBehaviour
 		float best = PlayerPrefs.GetFloat("BestDistance", 0f);
 		if (dist > best) { best = dist; PlayerPrefs.SetFloat("BestDistance", best); }
 
+		int xpEarned    = ProgressionManager.Instance?.GetXPEarnedThisRun() ?? 0;
+
 		ProgressionManager.Instance?.CommitXP();
 
 		// if (collectibleManager != null && SkillTree.Instance != null)
 		//	SkillTree.Instance.AddShards(collectibleManager.TotalShards);
-
-		PlayerPrefs.Save();
-
+	
 		int cipherLevel = PlayerPrefs.GetInt("CipherLevel", 1);
-		int xpEarned    = ProgressionManager.Instance?.GetXPEarnedThisRun() ?? 0;
+		PlayerPrefs.Save();
 
 		goDistanceText.text = $"Distance: {dist:F0}m";
 		goBestText.text     = $"Best: {best:F0}m";

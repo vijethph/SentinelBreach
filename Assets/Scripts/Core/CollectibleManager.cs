@@ -59,4 +59,11 @@ public class CollectibleManager : MonoBehaviour
 				break;
         }
     }
+	
+	/// <summary>Awards bonus shards from narrative choice, updates HUD.</summary>
+	public void NotifyBonusShards(int amount)
+	{
+		TotalShards += amount;
+		OnShardCollected?.Invoke(TotalShards);
+	}
 }
