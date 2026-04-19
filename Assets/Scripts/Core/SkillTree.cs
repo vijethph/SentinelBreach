@@ -2,15 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Manages the persistent skill tree.
-/// Reads SkillData assets, saves/loads upgrade levels via PlayerPrefs,
-/// and exposes modifier methods so PlayerController and GadgetManager
-/// can query the current bonus at run start.
-/// </summary>
+
+
+
+
+
+
 public class SkillTree : MonoBehaviour
 {
-    // ─── Singleton ───────────────────────────────────────────────
+    
     public static SkillTree Instance { get; private set; }
 
     void Awake()
@@ -22,27 +22,27 @@ public class SkillTree : MonoBehaviour
 		}
 		else
 		{
-			Destroy(gameObject);  // destroy duplicate if scene reloaded
+			Destroy(gameObject);  
 			return;
 		}
 	}
 
-    // ─── Inspector ───────────────────────────────────────────────
+    
     [Header("Skill Data Assets (assign all 5)")]
-    public SkillData[] skills;   // drag SD_Speed, SD_Shield, etc. here in the Inspector
+    public SkillData[] skills;   
 
-    // ─── Public API ──────────────────────────────────────────────
+    
 
-    /// <summary>Returns current upgrade level (0 = not purchased) for a node.</summary>
+    
     public int GetLevel(string nodeId)
     {
         return PlayerPrefs.GetInt("Skill_" + nodeId, 0);
     }
 
-    /// <summary>
-    /// Attempts to purchase the next level of a skill.
-    /// Returns true if successful, false if max level or insufficient shards.
-    /// </summary>
+    
+    
+    
+    
     public bool TryUpgrade(string nodeId, int currentShards, out int newShards)
     {
         newShards = currentShards;
@@ -55,7 +55,7 @@ public class SkillTree : MonoBehaviour
         int cost = data.costs[currentLevel];
         if (currentShards < cost) return false;
 
-        // Deduct cost, save new level
+        
         newShards = currentShards - cost;
         PlayerPrefs.SetInt("Skill_" + nodeId, currentLevel + 1);
         PlayerPrefs.SetInt("TotalShards", newShards);
@@ -63,10 +63,10 @@ public class SkillTree : MonoBehaviour
         return true;
     }
 
-    // ─── Modifier Getters ─────────────────────────────────────────
-    // Called at run start by PlayerController and GadgetManager.
+    
+    
 
-    /// <summary>Speed multiplier from Neural Speed skill. Base = 1.0.</summary>
+    
     public float GetSpeedMultiplier()
     {
         int level = GetLevel("speed");
@@ -74,7 +74,7 @@ public class SkillTree : MonoBehaviour
         return multipliers[Mathf.Clamp(level, 0, 3)];
     }
 
-    /// <summary>Bonus starting HP from Nano Shield skill.</summary>
+    
     public int GetBonusHP()
     {
         int level = GetLevel("shield");
@@ -82,7 +82,7 @@ public class SkillTree : MonoBehaviour
         return bonuses[Mathf.Clamp(level, 0, 3)];
     }
 
-    /// <summary>Extra shard collection radius in world units.</summary>
+    
     public float GetHackRangeBonus()
     {
         int level = GetLevel("hackrange");
@@ -90,7 +90,7 @@ public class SkillTree : MonoBehaviour
         return bonuses[Mathf.Clamp(level, 0, 3)];
     }
 
-    /// <summary>Cooldown multiplier for all gadgets. Base = 1.0 (lower = faster).</summary>
+    
     public float GetGadgetCooldownMultiplier()
     {
         int level = GetLevel("gadgeteff");
@@ -98,15 +98,15 @@ public class SkillTree : MonoBehaviour
         return multipliers[Mathf.Clamp(level, 0, 3)];
     }
 
-    /// <summary>Knockback force multiplier. Base = 1.0 (lower = less knockback).</summary>
+    
     public float GetKnockbackResistance()
     {
         int level = GetLevel("knockbackres");
-        float[] multipliers = { 1.0f, 0.8f, 0.6f, 0f }; // 0 = immune
+        float[] multipliers = { 1.0f, 0.8f, 0.6f, 0f }; 
         return multipliers[Mathf.Clamp(level, 0, 3)];
     }
 
-    // ─── Helpers ─────────────────────────────────────────────────
+    
 
     public SkillData GetSkillData(string nodeId)
     {
@@ -115,13 +115,13 @@ public class SkillTree : MonoBehaviour
         return null;
     }
 
-    /// <summary>Reads total shards from PlayerPrefs (persisted across scenes).</summary>
+    
     public int GetTotalShards() => PlayerPrefs.GetInt("TotalShards", 0);
 
-    /// <summary>
-	/// Adds shards and persists. Called by quest rewards and other bonuses.
-	/// NOT called for normal shard pickups — those save directly in CollectibleManager.
-	/// </summary>
+    
+	
+	
+	
 	public void AddShards(int amount)
 	{
 		if (amount <= 0) return;

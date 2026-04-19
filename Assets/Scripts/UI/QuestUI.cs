@@ -4,10 +4,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
-/// Displays 3 active quest cards in the HUD.
-/// Uses a one-frame delayed init coroutine so QuestManager is always ready first.
-/// </summary>
+
+
+
+
 public class QuestUI : MonoBehaviour
 {
     [System.Serializable]
@@ -16,8 +16,8 @@ public class QuestUI : MonoBehaviour
         public GameObject          cardRoot;
         public TextMeshProUGUI     descText;
         public TextMeshProUGUI     progressText;
-        public Image               progressBar;       // Image Type = Filled, Horizontal fill
-        public GameObject          completedOverlay;  // green panel shown when done
+        public Image               progressBar;       
+        public GameObject          completedOverlay;  
     }
 
     [Header("Quest Cards (must be exactly 3)")]
@@ -25,13 +25,13 @@ public class QuestUI : MonoBehaviour
 
     void Start()
     {
-        // Delay one frame to guarantee QuestManager.Start() has run
+        
         StartCoroutine(InitAfterOneFrame());
     }
 
     IEnumerator InitAfterOneFrame()
     {
-        yield return null;  // skip one frame
+        yield return null;  
 
         if (QuestManager.Instance == null)
         {
@@ -39,10 +39,10 @@ public class QuestUI : MonoBehaviour
             yield break;
         }
 
-        // Subscribe to live progress updates
+        
         QuestManager.Instance.OnProgressUpdated += UpdateCard;
 
-        // Populate initial state
+        
         for (int i = 0; i < cards.Length; i++)
         {
             if (cards[i] == null) continue;
@@ -50,7 +50,7 @@ public class QuestUI : MonoBehaviour
             QuestData q = QuestManager.Instance.GetQuest(i);
             if (q == null)
             {
-                // More quests than cards or not enough quest data assets
+                
                 if (cards[i].cardRoot != null) cards[i].cardRoot.SetActive(false);
                 continue;
             }

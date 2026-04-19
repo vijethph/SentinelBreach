@@ -6,10 +6,10 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
 
-/// <summary>
-/// Central game controller. Subscribes to PlayerHealth events.
-/// Updates HUD and shows Game Over screen on death.
-/// </summary>
+
+
+
+
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
@@ -44,13 +44,13 @@ public class GameManager : MonoBehaviour
     private float score    = 0f;
     private bool  gameOver = false;
 	
-	// ─── Run Tracking ─────────────────────────────────────────────
+	
 	private int shardsThisRun   = 0;
 	private int gadgetsUsedThisRun = 0;
 
     void Start()
     {
-        // Find player components
+        
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player == null) { Debug.LogError("GameManager: No Player found!"); return; }
 
@@ -58,7 +58,7 @@ public class GameManager : MonoBehaviour
         playerHealth       = player.GetComponent<PlayerHealth>();
         collectibleManager = CollectibleManager.Instance;
 
-        // Subscribe to events
+        
         if (playerHealth != null)
         {
             playerHealth.OnDeath         += HandleDeath;
@@ -67,12 +67,12 @@ public class GameManager : MonoBehaviour
         if (collectibleManager != null)
             collectibleManager.OnShardCollected += UpdateShardUI;
 
-        // Initial state
+        
         gameOverPanel.SetActive(false);
         hudPanel.SetActive(true);
         Application.targetFrameRate = 60;
 		
-		// After existing subscriptions, add:
+		
 		if (collectibleManager != null)
 			collectibleManager.OnShardCollected += _ => shardsThisRun = collectibleManager.TotalShards;
     }
@@ -86,20 +86,20 @@ public class GameManager : MonoBehaviour
         scoreText.text    = $"{(int)score:N0}";
     }
 
-    // ─── Event Handlers ──────────────────────────────────────────
+    
 
     void UpdateHealthBar(int current, int max)
 	{
 		if (healthBarFill == null) return;
 
-		// Drive the fill amount — this makes the bar shrink
+		
 		float ratio = max > 0 ? (float)current / max : 0f;
 		healthBarFill.fillAmount = ratio;
 
-		// Colour shift: green at full HP → red at zero HP
+		
 		healthBarFill.color = Color.Lerp(Color.red, new Color(0f, 0.86f, 0.31f), ratio);
 
-		// Update percentage text if assigned
+		
 		if (hpPercentText != null)
 			hpPercentText.text = $"{Mathf.RoundToInt(ratio * 100f)}%";
 	}
@@ -114,7 +114,7 @@ public class GameManager : MonoBehaviour
 		if (gameOver) return;
 		gameOver = true;
 		
-		// Disable pause input when game is over
+		
 		if (PauseManager.Instance != null)
 			PauseManager.Instance.enabled = false;
 
@@ -128,8 +128,8 @@ public class GameManager : MonoBehaviour
 
 		ProgressionManager.Instance?.CommitXP();
 
-		// if (collectibleManager != null && SkillTree.Instance != null)
-		//	SkillTree.Instance.AddShards(collectibleManager.TotalShards);
+		
+		
 	
 		int cipherLevel = PlayerPrefs.GetInt("CipherLevel", 1);
 		PlayerPrefs.Save();
@@ -146,7 +146,7 @@ public class GameManager : MonoBehaviour
 		AudioManager.Instance?.PlayDeath();
 	}
 
-    // ─── Button Callbacks ─────────────────────────────────────────
+    
 
     public void RestartGame()
     {

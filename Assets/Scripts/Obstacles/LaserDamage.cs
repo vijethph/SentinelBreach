@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Attached to the LaserGrid trigger collider.
-/// Deals damage when the player enters the laser beam zone.
-/// </summary>
+
+
+
+
 public class LaserDamage : MonoBehaviour
 {
     [Tooltip("HP damage dealt to the player per hit.")]

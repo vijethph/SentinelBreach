@@ -2,14 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Manages the 3 gadget slots: Dash, EMP, Time-Slow.
-/// Tracks cooldowns. Exposes Activate(slot) for both PC and Android input.
-/// Gadget effects reuse the custom physics system in PlayerController.
-/// </summary>
+
+
+
+
+
 public class GadgetManager : MonoBehaviour
 {
-    // ─── Singleton ───────────────────────────────────────────────
+    
     public static GadgetManager Instance { get; private set; }
 
     void Awake()
@@ -18,24 +18,24 @@ public class GadgetManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    // ─── Inspector ───────────────────────────────────────────────
+    
     [Header("Gadget Data (assign GD_Dash, GD_EMP, GD_TimeSlow)")]
-    public GadgetData[] gadgetData;   // Index 0=Dash, 1=EMP, 2=TimeSlow
+    public GadgetData[] gadgetData;   
 
     [Header("EMP Settings")]
     public float empRadius = 10f;
 
-    // ─── Runtime State ───────────────────────────────────────────
-    private float[] cooldownTimers;   // remaining cooldown per slot
+    
+    private float[] cooldownTimers;   
     private bool[]  onCooldown;
 
     private PlayerController playerController;
 
-    // How many slots are currently unlocked (level-gated)
-    private int unlockedSlots = 1;   // starts with 1; CIPHER level unlocks more
+    
+    private int unlockedSlots = 1;   
 	public int TotalGadgetsUsed { get; private set; } = 0;
 
-    // ─────────────────────────────────────────────────────────────
+    
 
     void Start()
     {
@@ -46,10 +46,10 @@ public class GadgetManager : MonoBehaviour
         cooldownTimers = new float[count];
         onCooldown     = new bool[count];
 
-        // Apply Gadget Efficiency skill tree bonus
-        // (SkillTree reads from PlayerPrefs, which persists from MainMenu scene)
+        
+        
 		int savedLevel = PlayerPrefs.GetInt("CipherLevel", 1);
-		unlockedSlots = 1;  // always start from 1, apply perks sequentially
+		unlockedSlots = 1;  
 
 		if (savedLevel >= 2) UnlockSlot(1);
 		if (savedLevel >= 5) UnlockSlot(2);
@@ -57,12 +57,14 @@ public class GadgetManager : MonoBehaviour
 
     void Update()
     {
-        // ── PC keyboard input ─────────────────────────────────
-        if (Input.GetKeyDown(KeyCode.Q)) Activate(0);
-        if (Input.GetKeyDown(KeyCode.E)) Activate(1);
-        if (Input.GetKeyDown(KeyCode.R)) Activate(2);
+        
+        #if !UNITY_ANDROID
+		if (Input.GetKeyDown(KeyCode.Q)) Activate(0);
+		if (Input.GetKeyDown(KeyCode.E)) Activate(1);
+		if (Input.GetKeyDown(KeyCode.R)) Activate(2);
+		#endif
 
-        // ── Cooldown countdown ────────────────────────────────
+        
         for (int i = 0; i < cooldownTimers.Length; i++)
         {
             if (cooldownTimers[i] > 0f)
@@ -77,10 +79,10 @@ public class GadgetManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Activates a gadget by slot index.
-    /// Called from Update (PC) and SwipeInputHandler (Android).
-    /// </summary>
+    
+    
+    
+    
     public void Activate(int slot)
     {
         if (slot >= unlockedSlots) { Debug.Log($"[GadgetManager] Slot {slot} locked."); return; }
@@ -90,7 +92,7 @@ public class GadgetManager : MonoBehaviour
         GadgetData data = gadgetData[slot];
         if (data == null) return;
 
-        // Apply Gadget Efficiency multiplier from skill tree
+        
         float cooldownMult = SkillTree.Instance != null
             ? SkillTree.Instance.GetGadgetCooldownMultiplier() : 1f;
         float cooldown = data.baseCooldown * cooldownMult;
@@ -105,36 +107,36 @@ public class GadgetManager : MonoBehaviour
 		
 		TotalGadgetsUsed++;
 		
-		// In Activate(), after the switch statement:
+		
 		QuestManager.Instance?.NotifyGadgetUsed(data.gadgetId);
 
-        // Start cooldown
+        
         onCooldown[slot]     = true;
         cooldownTimers[slot] = cooldown;
 
-        // Notify UI
+        
         GadgetUI.Instance?.OnGadgetActivated(slot, cooldown);
     }
 
-    // ─── Gadget Implementations ───────────────────────────────────
+    
 
-    /// <summary>
-    /// DASH — forward burst using the SAME custom knockback system in PlayerController.
-    /// This is student-written physics reuse: impulse = -forward * force.
-    /// </summary>
+    
+    
+    
+    
     void ExecuteDash(float force)
     {
         if (playerController == null) return;
-        // Negative source position behind CIPHER = forward knockback
+        
         Vector3 behindCipher = playerController.transform.position - playerController.transform.forward * 5f;
         playerController.ApplyKnockback(behindCipher, force);
         Debug.Log("[GadgetManager] DASH activated.");
 		AudioManager.Instance?.PlayDash();
     }
 
-    /// <summary>
-    /// EMP PULSE — disables all turrets and drones within empRadius for duration seconds.
-    /// </summary>
+    
+    
+    
     void ExecuteEMP(float duration)
     {
         Vector3 origin = playerController != null
@@ -154,10 +156,10 @@ public class GadgetManager : MonoBehaviour
 		AudioManager.Instance?.PlayEMP();	
     }
 
-    /// <summary>
-    /// TIME-SLOW — reduces Time.timeScale to 0.3 for duration seconds.
-    /// Uses WaitForSecondsRealtime so the coroutine isn't affected by the slowdown itself.
-    /// </summary>
+    
+    
+    
+    
     void ExecuteTimeSlow(float duration)
     {
         StartCoroutine(TimeSlowCoroutine(duration));
@@ -175,14 +177,14 @@ public class GadgetManager : MonoBehaviour
         Debug.Log("[GadgetManager] TIME-SLOW ended.");
     }
 
-    // ─── Level-up Unlock ─────────────────────────────────────────
+    
 
-    /// <summary>Called by ProgressionManager when CIPHER reaches level 2 or 5.</summary>
+    
     public void UnlockSlot(int slot)
     {
 		
 		if (slot >= (gadgetData?.Length ?? 3)) return;
-		if (slot < unlockedSlots) return;  // already unlocked
+		if (slot < unlockedSlots) return;  
 
 		unlockedSlots = Mathf.Max(unlockedSlots, slot + 1);
 
@@ -191,11 +193,11 @@ public class GadgetManager : MonoBehaviour
 			: $"Gadget {slot + 1}";
 
 		Debug.Log($"[GadgetManager] Slot {slot} ({name}) unlocked.");
-		// Notify GadgetUI to refresh lock overlays
+		
 		GadgetUI.Instance?.RefreshLockState();
     }
 
-    // ─── Getters for UI ──────────────────────────────────────────
+    
 
     public float GetCooldownTimer(int slot) =>
         slot < cooldownTimers.Length ? cooldownTimers[slot] : 0f;
@@ -213,10 +215,10 @@ public class GadgetManager : MonoBehaviour
 
     public bool IsUnlocked(int slot) => slot < unlockedSlots;
 	
-	/// <summary>
-	/// Called when a Surge Token is collected.
-	/// Gradually refills all gadget cooldowns by reducing their remaining timers.
-	/// </summary>
+	
+	
+	
+	
 	public void StartSurgeRefill(float refillDuration = 3f)
 	{
 		StartCoroutine(SurgeRefillCoroutine(refillDuration));
@@ -230,13 +232,13 @@ public class GadgetManager : MonoBehaviour
 		while (elapsed < duration)
 		{
 			elapsed += Time.deltaTime;
-			float tickReduction = Time.deltaTime * (1f / duration); // fraction per frame
+			float tickReduction = Time.deltaTime * (1f / duration); 
 
 			for (int i = 0; i < cooldownTimers.Length; i++)
 			{
 				if (cooldownTimers[i] > 0f)
 				{
-					// Reduce the timer proportionally so all cooldowns drain toward 0
+					
 					cooldownTimers[i] = Mathf.Max(0f,
 						cooldownTimers[i] - tickReduction * GetMaxCooldown(i));
 

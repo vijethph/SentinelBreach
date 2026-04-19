@@ -2,15 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Data container for one skill tree node.
-/// Create instances via right-click > Create > CipherGame > Skill Data.
-/// </summary>
+
+
+
+
 [CreateAssetMenu(fileName = "SkillData", menuName = "CipherGame/Skill Data")]
 public class SkillData : ScriptableObject
 {
     [Header("Identity")]
-    public string nodeId;           // unique key used for PlayerPrefs — do NOT change after creation
+    public string nodeId;           
     public string displayName;
     [TextArea(2,4)]
     public string description;

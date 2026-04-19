@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// Handles pause state triggered by Escape key.
-/// Pauses Time.timeScale and shows/hides the pause panel.
-/// Does NOT show upgrades screen — that is only accessible from the Main Menu.
-/// </summary>
+
+
+
+
+
 public class PauseManager : MonoBehaviour
 {
     public static PauseManager Instance { get; private set; }
@@ -29,7 +29,7 @@ public class PauseManager : MonoBehaviour
 
     void Update()
     {
-        // Toggle pause with Escape key
+        
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (IsPaused) Resume();
@@ -42,7 +42,7 @@ public class PauseManager : MonoBehaviour
         if (IsPaused) return;
         IsPaused = true;
 
-        Time.timeScale = 0f;        // stops all physics, animations, coroutines
+        Time.timeScale = 0f;        
         if (pausePanel != null) pausePanel.SetActive(true);
 
         foreach (var obj in hideWhilePaused)
@@ -65,7 +65,7 @@ public class PauseManager : MonoBehaviour
         Debug.Log("[PauseManager] Game resumed.");
     }
 
-    /// <summary>Called by the Quit button in the pause panel.</summary>
+    
     public void QuitToMenu()
     {
         IsPaused = false;

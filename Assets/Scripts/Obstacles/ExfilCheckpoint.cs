@@ -4,22 +4,29 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
-/// Triggered when the player reaches an Exfil Checkpoint.
-/// Shows the EXFIL overlay, increases SENTINEL tier, and resumes.
-/// </summary>
+
+
+
+
 public class ExfilCheckpoint : MonoBehaviour
 {
     [Header("UI Reference")]
-    public GameObject exfilOverlayPanel;  // assign in Inspector (see Step 15.3)
+    public GameObject exfilOverlayPanel;  
 
     private bool triggered = false;
+	
+	void OnEnable()
+    {
+        
+        
+        triggered = false;
+    }
 
     void Start()
 	{
 		if (exfilOverlayPanel == null)
 		{
-			// Find by name if not assigned (works for runtime-spawned prefabs)
+			
 			GameObject overlay = GameObject.Find("Exfil_Overlay");
 			if (overlay != null) exfilOverlayPanel = overlay;
 		}
@@ -41,11 +48,12 @@ public class ExfilCheckpoint : MonoBehaviour
         ProgressionManager.Instance?.OnExfilReached();
 
         StartCoroutine(ExfilSequence());
+		Debug.Log("[ExfilCheckpoint] Triggered! SENTINEL tier will increase.");
     }
 
     IEnumerator ExfilSequence()
     {
-        // Show overlay
+        
         if (exfilOverlayPanel != null) exfilOverlayPanel.SetActive(true);
         Time.timeScale = 0.5f;
 
@@ -54,7 +62,7 @@ public class ExfilCheckpoint : MonoBehaviour
         Time.timeScale = 1f;
         if (exfilOverlayPanel != null) exfilOverlayPanel.SetActive(false);
 
-        // Increase SENTINEL tier (increases difficulty)
+        
         SentinelManager.Instance?.IncreaseTier();
         Debug.Log("[ExfilCheckpoint] Checkpoint reached. SENTINEL tier increased.");
 		AudioManager.Instance?.PlayExfil();

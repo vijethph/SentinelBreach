@@ -2,62 +2,66 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Android sensor-based input using accelerometer and gyroscope.
-/// Satisfies the A+ rubric requirement: "Android/iOS: screen touch, accelerator, gyroscope."
-///
-/// Lane control:   tilt device left/right  (accelerometer X axis)
-/// Jump:           tilt device sharply forward (gyroscope pitch) OR tap top half of screen
-/// Slide:          tilt device sharply backward (gyroscope pitch) OR tap bottom half of screen
-/// Gadgets:        on-screen UI buttons (wired in Step 17.2)
-/// </summary>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 public class AndroidInputHandler : MonoBehaviour
 {
-    // ─── Inspector ───────────────────────────────────────────────
+    
 
-    [Header("Lane Tilt (Accelerometer)")]
-    [Tooltip("Tilt angle (degrees) required to trigger a lane change.")]
-    public float laneThreshold = 20f;
+    [Header("Swipe Settings")]
+    public float swipeThreshold    = 50f;
+    public float maxSwipeTime      = 0.4f;
+    public float doubleTapInterval = 0.3f;
 
-    [Tooltip("Dead zone — tilts smaller than this are ignored.")]
-    public float laneDeadZone = 5f;
+    [Header("Tilt Settings (Accelerometer)")]
+    public float laneThreshold  = 20f;
+    public float laneDeadZone   = 5f;
+    public float laneChangeCooldown = 0.4f;
 
-    [Header("Jump / Slide Tilt (Gyroscope)")]
-    [Tooltip("Gyro angular velocity (rad/s) needed to trigger jump or slide.")]
+    [Header("Gyroscope Settings")]
     public float gyroJumpThreshold  = 3.0f;
     public float gyroSlideThreshold = 3.0f;
+    public float gyroCooldown       = 0.4f;
 
     [Header("Touch Fallback")]
-    [Tooltip("If true, tapping top half of screen jumps; bottom half slides.")]
-    public bool enableTouchFallback = true;
+    public bool  enableTouchFallback = true;
+    public float tapCooldown         = 0.5f;
 
-    [Tooltip("Cooldown between tap-jumps/slides in seconds.")]
-    public float tapCooldown = 0.5f;
-
-    // ─── Private ─────────────────────────────────────────────────
+    
 
     private PlayerController playerController;
 
-    // Lane switching debounce — prevents flickering
-    private float laneChangeCooldown  = 0.4f;
-    private float laneChangeTimer     = 0f;
-    private bool  isNeutral           = true;   // true when device is roughly flat
+    
+    private Vector2 touchStartPos;
+    private float   touchStartTime;
+    private bool    isSwiping;
+    private float   lastTapTimeLeft  = -1f;
+    private float   lastTapTimeRight = -1f;
 
-    // Gyro cooldown
-    private float gyroCooldown        = 0.4f;
-    private float gyroTimer           = 0f;
+    
+    private float laneChangeTimer = 0f;
+    private float gyroTimer       = 0f;
+    private float tapTimer        = 0f;
+    private float baselineTiltX   = 0f;
+    private bool  isNeutral       = true;
 
-    // Touch fallback cooldown
-    private float tapTimer = 0f;
-
-    // Baseline tilt — measured at scene start
-    private float baselineTiltX = 0f;
-
-    // ─────────────────────────────────────────────────────────────
+    
 
     void Start()
     {
-        // Only run on mobile
         if (!Application.isMobilePlatform)
         {
             enabled = false;
@@ -65,9 +69,8 @@ public class AndroidInputHandler : MonoBehaviour
         }
 
         playerController = GameObject.FindGameObjectWithTag("Player")
-                                      ?.GetComponent<PlayerController>();
+                                     ?.GetComponent<PlayerController>();
 
-        // Enable gyroscope
         if (SystemInfo.supportsGyroscope)
         {
             Input.gyro.enabled = true;
@@ -75,131 +78,190 @@ public class AndroidInputHandler : MonoBehaviour
         }
         else
         {
-            Debug.Log("[AndroidInput] Gyroscope not supported on this device. Tap fallback active.");
+            Debug.Log("[AndroidInput] Gyroscope not available — using touch fallback.");
         }
 
-        // Measure baseline tilt so the player can hold the phone
-        // at their preferred angle and it still registers as "neutral"
         baselineTiltX = Input.acceleration.x;
-        Debug.Log($"[AndroidInput] Baseline tilt X = {baselineTiltX:F2}");
     }
 
     void Update()
     {
         if (playerController == null) return;
 
-        HandleLaneTilt();
-        HandleJumpSlide();
-        HandleTouchFallback();
-
-        // Tick cooldown timers
+        
         if (laneChangeTimer > 0f) laneChangeTimer -= Time.deltaTime;
         if (gyroTimer       > 0f) gyroTimer       -= Time.deltaTime;
         if (tapTimer        > 0f) tapTimer         -= Time.deltaTime;
+
+        
+        HandleSwipeInput();
+        HandleSensorInput();
     }
 
-    // ─── Lane control via accelerometer ──────────────────────────
+    
 
-    void HandleLaneTilt()
+    void HandleSwipeInput()
+    {
+        if (Input.touchCount == 0) return;
+
+        
+        if (Input.touchCount == 2)
+        {
+            Touch t0 = Input.GetTouch(0);
+            Touch t1 = Input.GetTouch(1);
+            if (t0.phase == TouchPhase.Began && t1.phase == TouchPhase.Began)
+            {
+                GadgetManager.Instance?.Activate(2);
+                return;
+            }
+        }
+
+        Touch touch = Input.GetTouch(0);
+
+        switch (touch.phase)
+        {
+            case TouchPhase.Began:
+                touchStartPos  = touch.position;
+                touchStartTime = Time.realtimeSinceStartup;
+                isSwiping      = true;
+                break;
+
+            case TouchPhase.Ended:
+                if (!isSwiping) break;
+                isSwiping = false;
+
+                Vector2 delta    = touch.position - touchStartPos;
+                float   duration = Time.realtimeSinceStartup - touchStartTime;
+                float   dist     = delta.magnitude;
+                bool    leftHalf = touchStartPos.x < Screen.width * 0.5f;
+
+                if (dist >= swipeThreshold && duration <= maxSwipeTime)
+                {
+                    
+                    if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
+                    {
+                        
+                        playerController.SwipeLane(delta.x < 0f ? -1 : 1);
+                    }
+                    else
+                    {
+                        
+                        if (delta.y > 0f) playerController.SwipeJump();
+                        else              playerController.SwipeSlide();
+                    }
+                }
+                else if (dist < 20f && duration < 0.2f)
+                {
+                    
+                    if (IsPointerOverUI(touch.position)) break;
+
+                    if (leftHalf)
+                    {
+                        if (Time.realtimeSinceStartup - lastTapTimeLeft <= doubleTapInterval)
+                            GadgetManager.Instance?.Activate(0);  
+                        lastTapTimeLeft = Time.realtimeSinceStartup;
+                    }
+                    else
+                    {
+                        if (Time.realtimeSinceStartup - lastTapTimeRight <= doubleTapInterval)
+                            GadgetManager.Instance?.Activate(1);  
+                        lastTapTimeRight = Time.realtimeSinceStartup;
+                    }
+                }
+                break;
+
+            case TouchPhase.Canceled:
+                isSwiping = false;
+                break;
+        }
+    }
+
+    
+
+    void HandleSensorInput()
+    {
+        HandleTiltLanes();
+        HandleGyroJumpSlide();
+        if (enableTouchFallback) HandleTouchFallback();
+    }
+
+    void HandleTiltLanes()
     {
         if (laneChangeTimer > 0f) return;
 
-        // Convert accelerometer.x to approximate tilt angle in degrees
-        // accelerometer.x ranges roughly -1 to +1 for full left/right tilt
-        float rawX       = Input.acceleration.x - baselineTiltX;
-        float tiltDeg    = rawX * 90f;  // approximate conversion
+        float rawX   = Input.acceleration.x - baselineTiltX;
+        float tiltDeg = rawX * 90f;
 
         if (tiltDeg < -laneThreshold)
         {
-            // Tilted LEFT
             playerController.SwipeLane(-1);
             laneChangeTimer = laneChangeCooldown;
-            isNeutral       = false;
+            isNeutral = false;
         }
         else if (tiltDeg > laneThreshold)
         {
-            // Tilted RIGHT
             playerController.SwipeLane(1);
             laneChangeTimer = laneChangeCooldown;
-            isNeutral       = false;
+            isNeutral = false;
         }
         else if (Mathf.Abs(tiltDeg) < laneDeadZone)
         {
-            // Phone returned to neutral — allow next lane change
             isNeutral = true;
         }
     }
 
-    // ─── Jump / Slide via gyroscope ──────────────────────────────
-
-    void HandleJumpSlide()
+    void HandleGyroJumpSlide()
     {
-        if (!Input.gyro.enabled)          return;
-        if (gyroTimer > 0f)               return;
+        if (!Input.gyro.enabled || gyroTimer > 0f) return;
 
-        // Gyro rotationRate gives angular velocity in device space
-        // rotationRate.x is pitch (tilt forward = negative, tilt back = positive)
         float pitch = Input.gyro.rotationRate.x;
 
         if (pitch < -gyroJumpThreshold)
         {
-            // Sharp forward tilt → JUMP
             playerController.SwipeJump();
             gyroTimer = gyroCooldown;
         }
         else if (pitch > gyroSlideThreshold)
         {
-            // Sharp backward tilt → SLIDE
             playerController.SwipeSlide();
             gyroTimer = gyroCooldown;
         }
     }
 
-    // ─── Touch fallback (if gyro unavailable or player prefers tap) ─
-
     void HandleTouchFallback()
     {
-        if (!enableTouchFallback) return;
-        if (Input.touchCount == 0)  return;
-        if (tapTimer > 0f)          return;
+        if (Input.touchCount == 0 || tapTimer > 0f) return;
 
         for (int i = 0; i < Input.touchCount; i++)
         {
             Touch t = Input.GetTouch(i);
             if (t.phase != TouchPhase.Began) continue;
-
-            // Ignore if the touch is on a UI button (already handled by EventSystem)
             if (IsPointerOverUI(t.position)) continue;
 
-            bool topHalf = t.position.y > Screen.height * 0.5f;
-            if (topHalf)
-                playerController.SwipeJump();
-            else
-                playerController.SwipeSlide();
-
-            tapTimer = tapCooldown;
-            break;
+            
+            if (!Input.gyro.enabled)
+            {
+                bool topHalf = t.position.y > Screen.height * 0.5f;
+                if (topHalf) playerController.SwipeJump();
+                else         playerController.SwipeSlide();
+                tapTimer = tapCooldown;
+                break;
+            }
         }
     }
 
-    // ─── Helpers ─────────────────────────────────────────────────
+    
 
     bool IsPointerOverUI(Vector2 screenPos)
     {
-        // Prevent tap-behind-button false triggers
         return UnityEngine.EventSystems.EventSystem.current != null
             && UnityEngine.EventSystems.EventSystem.current
                           .IsPointerOverGameObject(-1);
     }
 
-    /// <summary>
-    /// Re-calibrates the neutral tilt baseline.
-    /// Call this from a UI "Calibrate" button if the player holds the phone
-    /// at a tilted angle as their default position.
-    /// </summary>
     public void Recalibrate()
     {
         baselineTiltX = Input.acceleration.x;
-        Debug.Log($"[AndroidInput] Recalibrated. New baseline = {baselineTiltX:F2}");
+        Debug.Log($"[AndroidInput] Recalibrated. Baseline = {baselineTiltX:F2}");
     }
 }

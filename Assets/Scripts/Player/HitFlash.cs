@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Briefly flashes CIPHER's material to white on taking damage.
-/// Classic hit-flash technique used in all action games.
-/// Works on a joined mesh with multiple material slots.
-/// </summary>
+
+
+
+
+
 public class HitFlash : MonoBehaviour
 {
     public static HitFlash Instance { get; private set; }
@@ -27,7 +27,7 @@ public class HitFlash : MonoBehaviour
 
     void Start()
     {
-        // Collect all renderers on CIPHER and its children
+        
         GetComponentsInChildren<Renderer>(true, renderers);
 
         foreach (var r in renderers)
@@ -44,7 +44,7 @@ public class HitFlash : MonoBehaviour
     {
         flashing = true;
 
-        // Create white override materials
+        
         for (int i = 0; i < renderers.Count; i++)
         {
             if (renderers[i] == null) continue;
@@ -61,7 +61,7 @@ public class HitFlash : MonoBehaviour
 
         yield return new WaitForSeconds(flashDuration);
 
-        // Restore original materials
+        
         for (int i = 0; i < renderers.Count; i++)
         {
             if (renderers[i] != null)

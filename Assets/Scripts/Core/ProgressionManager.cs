@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Manages CIPHER's permanent level progression across all runs.
-/// XP is earned from: distance run, mini-quests completed, exfil checkpoints.
-/// Persisted via PlayerPrefs. Unlocks gadget slots and other perks at specific levels.
-/// </summary>
+
+
+
+
+
 public class ProgressionManager : MonoBehaviour
 {
     public static ProgressionManager Instance { get; private set; }
@@ -18,15 +18,15 @@ public class ProgressionManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    // ─── XP Thresholds per level (level 1→2 needs 100 XP, etc.) ─
+    
     private static readonly int[] xpThresholds = { 0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700 };
 
-    public event Action<int> OnLevelUp;  // passes new level
+    public event Action<int> OnLevelUp;  
 
-    // Float accumulator fixes the per-frame FloorToInt → 0 bug
+    
     private float xpAccumulator    = 0f;
     private int   xpEarnedThisRun  = 0;
-    private bool  committed        = false;   // guard against double-commit
+    private bool  committed        = false;   
 	
 	private PlayerController playerControllerCache;
 
@@ -36,7 +36,7 @@ public class ProgressionManager : MonoBehaviour
         xpEarnedThisRun = 0;
         committed       = false;
 		
-        // Subscribe to quest completions for XP
+        
         if (QuestManager.Instance != null)
             QuestManager.Instance.OnQuestCompleted += OnQuestXP;
     }
@@ -45,7 +45,7 @@ public class ProgressionManager : MonoBehaviour
     {
         if (GameObject.FindGameObjectWithTag("Player")?.GetComponent<PlayerController>() is PlayerController pc && pc.IsRunning)
         {
-            // 1 XP per 10m run
+            
             xpEarnedThisRun += Mathf.FloorToInt(pc.runSpeed * Time.deltaTime / 10f);
         }
     }
@@ -55,15 +55,15 @@ public class ProgressionManager : MonoBehaviour
         xpEarnedThisRun += xpReward;
     }
 
-    /// <summary>Called by QuestManager when exfil checkpoint is reached.</summary>
+    
     public void OnExfilReached()
     {
         xpEarnedThisRun += 100;
     }
 
-    /// <summary>
-    /// Called at run end (GameManager.HandleDeath) to commit XP to persistent storage.
-    /// </summary>
+    
+    
+    
     public int CommitXP()
     {
 		if (committed)
@@ -73,7 +73,7 @@ public class ProgressionManager : MonoBehaviour
         }
         committed = true;
 		
-		// Flush any remaining fractional accumulator
+		
         if (xpAccumulator >= 1f)
         {
             xpEarnedThisRun += Mathf.FloorToInt(xpAccumulator);
@@ -98,7 +98,7 @@ public class ProgressionManager : MonoBehaviour
         return xpEarnedThisRun;
     }
 
-    // ─── Getters ─────────────────────────────────────────────────
+    
 
     public int GetCurrentLevel()     => PlayerPrefs.GetInt("CipherLevel", 1);
     public int GetCurrentXP()        => PlayerPrefs.GetInt("CipherXP", 0);
@@ -106,7 +106,7 @@ public class ProgressionManager : MonoBehaviour
                                         ? xpThresholds[GetCurrentLevel()] : 99999;
     public int GetXPEarnedThisRun()  => xpEarnedThisRun;
 
-    // ─── Internal ────────────────────────────────────────────────
+    
 
     static int CalculateLevel(int totalXP)
     {

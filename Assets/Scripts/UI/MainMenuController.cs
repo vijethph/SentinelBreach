@@ -9,7 +9,7 @@ public class MainMenuController : MonoBehaviour
 {
     [Header("UI References")]
     public TextMeshProUGUI levelBadgeText;
-    public GameObject skillTreePanel;   // assign in Inspector after building it below
+    public GameObject skillTreePanel;   
 	
 	[Header("XP Bar")]
 	public Image           xpBarFill;
@@ -22,7 +22,7 @@ public class MainMenuController : MonoBehaviour
 
 		if (levelBadgeText) levelBadgeText.text = $"LVL {level}";
 
-		// XP bar fill
+		
 		int[] thresholds = { 0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700 };
 		if (level <= thresholds.Length)
 		{

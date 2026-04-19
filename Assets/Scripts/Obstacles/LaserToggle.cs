@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Toggles the laser beam on and off on a timed cycle.
-/// Creates a rhythm the player must time their movement around.
-/// </summary>
+
+
+
+
 public class LaserToggle : MonoBehaviour
 {
     [Header("Timing")]
@@ -27,23 +27,23 @@ public class LaserToggle : MonoBehaviour
 
     void Start()
     {
-        // Randomise start phase so multiple lasers in one segment don't all flash together
+        
         randomStartOffset = Random.Range(0f, onDuration + offDuration);
         StartCoroutine(ToggleLaser());
     }
 
     IEnumerator ToggleLaser()
     {
-        // Wait for random offset before starting
+        
         yield return new WaitForSeconds(randomStartOffset);
 
         while (true)
         {
-            // ── LASER ON ───────────────────────────────────────────
+            
             SetLaserActive(true);
             yield return new WaitForSeconds(onDuration);
 
-            // ── LASER OFF ──────────────────────────────────────────
+            
             SetLaserActive(false);
             yield return new WaitForSeconds(offDuration);
         }
@@ -55,9 +55,9 @@ public class LaserToggle : MonoBehaviour
         if (laserCollider != null) laserCollider.enabled = active;
     }
 
-    /// <summary>
-    /// Called by EMP gadget (Week 3) to force the laser off temporarily.
-    /// </summary>
+    
+    
+    
     public void ForceOff(float duration)
     {
         StartCoroutine(ForceOffCoroutine(duration));

@@ -3,22 +3,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Manages CIPHER's HP. Handles damage, i-frames, knockback, and death.
-/// </summary>
+
+
+
 public class PlayerHealth : MonoBehaviour
 {
     [Header("Settings")]
     public int   maxHP               = 100;
     public float invincibilityDuration = 1.5f;
 
-    // Public state
+    
     public int  CurrentHP    { get; private set; }
     public bool IsInvincible { get; private set; }
 
-    // Events for GameManager and UI
+    
     public event Action       OnDeath;
-    public event Action<int, int> OnHealthChanged;  // (current, max)
+    public event Action<int, int> OnHealthChanged;  
 
     private PlayerController playerController;
     private float            invincibleTimer;
@@ -35,7 +35,7 @@ public class PlayerHealth : MonoBehaviour
 		CurrentHP = maxHP;
 		playerController = GetComponent<PlayerController>();
 
-		// ── Apply Shield bonus HP ─────────────────────────────────
+		
 		if (SkillTree.Instance != null)
 		{
 			int bonus = SkillTree.Instance.GetBonusHP();
@@ -60,11 +60,11 @@ public class PlayerHealth : MonoBehaviour
         if (IsInvincible || CurrentHP <= 0) return;
 
         CurrentHP = Mathf.Max(0, CurrentHP - amount);
-		// In TakeDamage(), after currentHP is reduced:
+		
 		QuestManager.Instance?.NotifyDamageTaken();
         OnHealthChanged?.Invoke(CurrentHP, maxHP);
 
-        // Delegate knockback to custom physics
+        
         if (sourcePosition != default)
 			playerController?.ApplyKnockback(sourcePosition, knockbackForce);
 		

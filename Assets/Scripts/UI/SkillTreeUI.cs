@@ -4,16 +4,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
-/// Drives the Skill Tree upgrade screen UI.
-/// One instance manages all 5 node cards.
-/// </summary>
+
+
+
+
 public class SkillTreeUI : MonoBehaviour
 {
     [System.Serializable]
     public class SkillCardUI
     {
-        public string nodeId;                   // must match SkillData.nodeId
+        public string nodeId;                   
         public TextMeshProUGUI nameText;
         public TextMeshProUGUI descText;
         public TextMeshProUGUI levelText;
@@ -29,7 +29,7 @@ public class SkillTreeUI : MonoBehaviour
 
     void OnEnable()
     {
-        // Refresh every time the panel opens
+        
         RefreshAll();
     }
 
@@ -66,10 +66,10 @@ public class SkillTreeUI : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Called by each Upgrade button's OnClick event.
-    /// Pass the nodeId as a string parameter in the Button Inspector.
-    /// </summary>
+    
+    
+    
+    
     public void OnUpgradePressed(string nodeId)
     {
         if (SkillTree.Instance == null) return;

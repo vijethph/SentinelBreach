@@ -4,10 +4,10 @@ using UnityEngine;
 
 using TMPro;
 
-/// <summary>
-/// Displays a brief popup when a quest is completed.
-/// Auto-dismisses after displayDuration seconds.
-/// </summary>
+
+
+
+
 public class QuestPopup : MonoBehaviour
 {
     public static QuestPopup Instance { get; private set; }
@@ -23,7 +23,7 @@ public class QuestPopup : MonoBehaviour
     public TextMeshProUGUI questTitleText;
     public TextMeshProUGUI questDescText;
     public TextMeshProUGUI rewardText;
-    public CanvasGroup     canvasGroup;   // for fade effect
+    public CanvasGroup     canvasGroup;   
 
     [Header("Settings")]
     public float displayDuration = 3f;
@@ -31,9 +31,9 @@ public class QuestPopup : MonoBehaviour
 
     private Coroutine activeCoroutine;
 
-    /// <summary>
-    /// Call this to show the popup for a completed quest.
-    /// </summary>
+    
+    
+    
     public void ShowCompletion(QuestData quest)
     {
         if (quest == null) return;
@@ -52,14 +52,14 @@ public class QuestPopup : MonoBehaviour
 
     IEnumerator ShowAndFade()
     {
-        // Instant show
+        
         popupPanel.SetActive(true);
         canvasGroup.alpha = 1f;
 
-        // Hold for displayDuration
+        
         yield return new WaitForSeconds(displayDuration);
 
-        // Fade out
+        
         while (canvasGroup.alpha > 0f)
         {
             canvasGroup.alpha -= fadeSpeed * Time.deltaTime;

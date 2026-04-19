@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Tracks the current SENTINEL security tier (1–5).
-/// Higher tiers increase obstacle density and run speed.
-/// </summary>
+
+
+
+
 public class SentinelManager : MonoBehaviour
 {
     public static SentinelManager Instance { get; private set; }
@@ -35,10 +35,10 @@ public class SentinelManager : MonoBehaviour
 		if (currentTier >= 5) return;
 		currentTier++;
 		if (playerController != null) playerController.runSpeed += speedBonusPerTier;
-		AudioManager.Instance?.IncreaseMusicPitch();    // ← ADD THIS
+		AudioManager.Instance?.IncreaseMusicPitch();    
 	}
 	
-	/// <summary>Applied by STEALTH narrative choice — reduces turret rotation speed.</summary>
+	
 	public void ApplyStealthModifier()
 	{
 		foreach (var turret in FindObjectsOfType<TurretController>())

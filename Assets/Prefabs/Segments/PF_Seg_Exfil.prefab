@@ -335,6 +335,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1755624824243106855}
+  - component: {fileID: 6201354002322045677}
   m_Layer: 0
   m_Name: Exfil_Checkpoint
   m_TagString: Untagged
@@ -360,6 +361,19 @@ Transform:
   - {fileID: 9186509868567096694}
   m_Father: {fileID: 5289084486827612962}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6201354002322045677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4229315476472015480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d3a1c6333f080e4bbed03ad1c532270, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  exfilOverlayPanel: {fileID: 0}
 --- !u!1 &5562332603224571859
 GameObject:
   m_ObjectHideFlags: 0

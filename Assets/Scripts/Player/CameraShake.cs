@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Attaches to the Cinemachine virtual camera or Main Camera.
-/// Shakes the camera for a brief duration when called.
-/// Uses a perlin noise offset — no external packages required.
-/// </summary>
+
+
+
+
+
 public class CameraShake : MonoBehaviour
 {
     public static CameraShake Instance { get; private set; }
@@ -28,7 +28,7 @@ public class CameraShake : MonoBehaviour
         originalPos = transform.localPosition;
     }
 
-    /// <summary>Trigger a camera shake. Call from PlayerHealth.TakeDamage.</summary>
+    
     public void Shake(float duration = -1f, float magnitude = -1f)
     {
         if (duration  < 0f) duration  = defaultDuration;
@@ -43,9 +43,9 @@ public class CameraShake : MonoBehaviour
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            float remaining = 1f - (elapsed / duration);   // fades out
+            float remaining = 1f - (elapsed / duration);   
 
-            // Perlin noise gives smooth pseudo-random shake
+            
             float x = (Mathf.PerlinNoise(elapsed * 30f, 0f) - 0.5f) * 2f * magnitude * remaining;
             float y = (Mathf.PerlinNoise(0f, elapsed * 30f) - 0.5f) * 2f * magnitude * remaining;
 

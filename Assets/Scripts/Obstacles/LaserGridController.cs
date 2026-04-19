@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Toggles the laser beam on and off rhythmically.
-/// Deals damage when the player runs through an active beam.
-/// </summary>
+
+
+
+
 [RequireComponent(typeof(LineRenderer), typeof(BoxCollider))]
 public class LaserGridController : MonoBehaviour
 {
@@ -15,18 +15,41 @@ public class LaserGridController : MonoBehaviour
     [Header("Timing")]
     public float onDuration  = 1.5f;
     public float offDuration = 1.0f;
-    public float startOffset = 0f;   // randomise in Inspector per laser
+    public float startOffset = 0f;   
 
     private LineRenderer lr;
     private BoxCollider  bc;
     private bool isOn = true;
+	private bool coroutineRunning = false;
+	
+	void Start()
+	{
+		ApplyDifficultyHeight();
+        if (!coroutineRunning)
+            StartCoroutine(ToggleRoutine());
+	}
+	
+	void ApplyDifficultyHeight()
+    {
+        if (DifficultyManager.Instance == null) return;
+
+        float rawHeight = DifficultyManager.Instance.LaserHeight;
+        float safeHeight = Mathf.Clamp(rawHeight, 0.2f, 1.8f);
+
+        
+        Vector3 worldPos = transform.position;
+        worldPos.y = safeHeight;
+        transform.position = worldPos;
+
+        onDuration = DifficultyManager.Instance.LaserOnDuration;
+    }
 
     void Awake()
     {
         lr = GetComponent<LineRenderer>();
         bc = GetComponent<BoxCollider>();
 
-        // Wire line renderer positions from child emitter transforms
+        
         Transform left  = transform.Find("Emitter_Left");
         Transform right = transform.Find("Emitter_Right");
         if (left != null && right != null)
@@ -39,11 +62,19 @@ public class LaserGridController : MonoBehaviour
 
     void OnEnable()
     {
-        StartCoroutine(ToggleRoutine());
+        
+		
+        isOn = false;
+        if (lr != null) lr.enabled = false;
+        if (bc != null) bc.enabled = false;
+        coroutineRunning = false;
+        StopAllCoroutines();
     }
 
     IEnumerator ToggleRoutine()
     {
+		coroutineRunning = true;
+		
         if (startOffset > 0f)
             yield return new WaitForSeconds(startOffset);
 
@@ -72,7 +103,7 @@ public class LaserGridController : MonoBehaviour
         ph?.TakeDamage(damage, transform.position);
     }
 
-    /// <summary>Called by EMP gadget (Week 3) to force beam off.</summary>
+    
     public void ForceOff(float duration) => StartCoroutine(ForceOffCoroutine(duration));
 
     IEnumerator ForceOffCoroutine(float dur)
@@ -83,10 +114,11 @@ public class LaserGridController : MonoBehaviour
         StartCoroutine(ToggleRoutine());
     }
 	
-	/// <summary>Disable the laser for duration seconds (called by Ghost Chip).</summary>
+	
 	public void GhostDisable(float duration)
 	{
 		StopAllCoroutines();
+		coroutineRunning = false;
 		SetBeam(false);
 		StartCoroutine(ReEnableAfter(duration));
 	}
@@ -97,7 +129,7 @@ public class LaserGridController : MonoBehaviour
 		StartCoroutine(ToggleRoutine());
 	}
 	
-	/// <summary>Applied by STEALTH narrative choice — slows the beam timing for this run.</summary>
+	
 	public void ApplyStealthTiming()
 	{
 		offDuration = Mathf.Min(offDuration + 0.8f, 3.5f);

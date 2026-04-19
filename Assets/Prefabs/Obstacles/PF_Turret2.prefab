@@ -80,10 +80,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   turretHead: {fileID: 4331826366136672409}
   muzzle: {fileID: 3733166135124375519}
-  rotationSpeed: 3
+  detectionRange: 14
   fireInterval: 1.5
-  detectionRange: 12
+  rotationSpeed: 12
   damage: 20
+  laserFlashDuration: 0.12
 --- !u!135 &7178847748604211773
 SphereCollider:
   m_ObjectHideFlags: 0

@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Data container controlling when and how often a segment type spawns.
-/// </summary>
+
+
+
 [CreateAssetMenu(fileName = "SegmentConfig", menuName = "CipherGame/Segment Config")]
 public class SegmentConfig : ScriptableObject
 {

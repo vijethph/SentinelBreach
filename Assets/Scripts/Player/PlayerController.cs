@@ -2,23 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Controls CIPHER's movement with entirely custom physics math.
-/// NO Rigidbody.AddForce — NO Physics.gravity.
-/// CharacterController is used ONLY for collision geometry (isGrounded, Move).
-/// This is what you explain in the interview for the Physics rubric.
-/// </summary>
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
-    // ─────────────────────────────────────────────
-    // INSPECTOR SETTINGS
-    // ─────────────────────────────────────────────
-
     [Header("Movement")]
     public float runSpeed = 8f;
-    public float laneWidth = 2.0f;       // X distance between lanes
-    public float laneSwitchSpeed = 10f;  // how fast CIPHER lerps to target X
+    public float laneWidth = 2.0f;
+    public float laneSwitchSpeed = 10f;
 
     [Header("Custom Gravity & Jump — Student-Written Physics")]
     [Tooltip("Gravity constant. Negative = downward. NOT Physics.gravity.")]
@@ -36,36 +26,28 @@ public class PlayerController : MonoBehaviour
     [Tooltip("How fast knockback velocity decays per second.")]
     public float knockbackDecay = 5f;
 
-    // ─────────────────────────────────────────────
-    // PRIVATE STATE
-    // ─────────────────────────────────────────────
-
     private CharacterController cc;
-	
-	// ── Input System ─────────────────────────────────────────────
+
 	private CipherInputActions inputActions;
 	private Vector2 moveInput;
 
-    // Custom physics — no Rigidbody
     private float verticalVelocity = 0f;
     private Vector3 knockbackVelocity = Vector3.zero;
 
-    // Lane
-    private int currentLane = 1;     // 0=left, 1=centre, 2=right
+    private int currentLane = 1;
     private float targetX = 0f;
 
-    // Slide
     private bool isSliding = false;
     private float slideTimer = 0f;
 
-    // Public state for other scripts
+	[Header("Slide Physics (student-written)")]
+	public float slideSpeedBoost = 3f;
+	public float slideDrag       = 4f;
+	private float slideExtraSpeed = 0f;
+
     public float DistanceRun { get; private set; } = 0f;
     public bool IsRunning { get; private set; } = true;
     public bool IsGrounded => cc != null && cc.isGrounded;
-
-    // ─────────────────────────────────────────────
-    // UNITY LIFECYCLE
-    // ─────────────────────────────────────────────
 
     void Start()
 	{
@@ -75,13 +57,12 @@ public class PlayerController : MonoBehaviour
 		cc.height = normalHeight;
 		cc.center = new Vector3(0f, normalHeight / 2f, 0f);
 
-		// ── Apply Skill Tree bonuses ──────────────────────────────
 		if (SkillTree.Instance != null)
 		{
 			runSpeed *= SkillTree.Instance.GetSpeedMultiplier();
 		}
 	}
-	
+
 	void OnEnable()
 	{
 		inputActions = new CipherInputActions();
@@ -108,19 +89,12 @@ public class PlayerController : MonoBehaviour
         TrackDistance();
     }
 
-    // ─────────────────────────────────────────────
-    // INPUT — uses legacy Input Manager
-    // ⚠️ Keep Active Input Handling = "Input Manager (Old)" in Player Settings
-    // ─────────────────────────────────────────────
-
     void HandleInput()
 	{
 		if (inputActions == null) return;
 
 		moveInput = inputActions.Player.Move.ReadValue<Vector2>();
 
-		// Lane switch — only trigger on direction change, not held
-		// We use a flag to prevent repeated triggers while key is held
 		float horizontal = moveInput.x;
 		if (horizontal < -0.5f && !laneMoving)
 		{
@@ -154,13 +128,10 @@ public class PlayerController : MonoBehaviour
 			StartSlide();
 	}
 
-    // ─────────────────────────────────────────────
-    // SLIDE
-    // ─────────────────────────────────────────────
-
     void StartSlide()
     {
         isSliding = true;
+		slideExtraSpeed = slideSpeedBoost;
         slideTimer = slideDuration;
         cc.height = slideHeight;
         cc.center = new Vector3(0f, slideHeight / 2f, 0f);
@@ -178,31 +149,29 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // ─────────────────────────────────────────────
-    // MOVEMENT — ALL CUSTOM PHYSICS
-    // ─────────────────────────────────────────────
-
     void ApplyMovement()
     {
-        // ── 1. Forward auto-run ────────────────────────────────────
         Vector3 move = Vector3.forward * runSpeed;
 
-        // ── 2. Lateral lane Lerp ───────────────────────────────────
+		if (isSliding && slideExtraSpeed > 0f)
+		{
+			slideExtraSpeed = Mathf.Lerp(slideExtraSpeed, 0f, slideDrag * Time.deltaTime);
+			if (slideExtraSpeed < 0.05f) slideExtraSpeed = 0f;
+		}
+
+		float effectiveSpeed = runSpeed + slideExtraSpeed;
+
         float currentX = transform.position.x;
         float newX = Mathf.Lerp(currentX, targetX, laneSwitchSpeed * Time.deltaTime);
         move.x = (newX - currentX) / Time.deltaTime;
 
-        // ── 3. CUSTOM GRAVITY ──────────────────────────────────────
-        // v = v₀ + a·t  — student-written, NOT Physics.gravity
         if (!cc.isGrounded)
             verticalVelocity += gravity * Time.deltaTime;
         else if (verticalVelocity < 0f)
-            verticalVelocity = -2f;   // ground snap, prevents drift
+			verticalVelocity = -2f;
 
         move.y = verticalVelocity;
 
-        // ── 4. CUSTOM KNOCKBACK DECAY ──────────────────────────────
-        // Exponential decay — student-written
         knockbackVelocity = Vector3.Lerp(
             knockbackVelocity,
             Vector3.zero,
@@ -210,8 +179,9 @@ public class PlayerController : MonoBehaviour
         );
         move += knockbackVelocity;
 
-        // ── 5. Apply — CharacterController handles geometry only ───
         cc.Move(move * Time.deltaTime);
+
+		move.z = effectiveSpeed;
     }
 
     void TrackDistance()
@@ -219,18 +189,10 @@ public class PlayerController : MonoBehaviour
         DistanceRun += runSpeed * Time.deltaTime;
     }
 
-    // ─────────────────────────────────────────────
-    // PUBLIC METHODS
-    // ─────────────────────────────────────────────
-
-    /// <summary>
-    /// CUSTOM PHYSICS: knockback impulse via vector math — NOT AddForce.
-    /// Called by all damage sources (laser, turret, drone).
-    /// </summary>
     public void ApplyKnockback(Vector3 sourcePosition, float force = 8f)
     {
         Vector3 dir = (transform.position - sourcePosition).normalized;
-        dir.y = 0.4f;  // slight upward lift
+		dir.y = 0.4f;
         dir.Normalize();
         knockbackVelocity = dir * force;
     }
@@ -242,29 +204,8 @@ public class PlayerController : MonoBehaviour
         verticalVelocity = 0f;
     }
 
-    // Called by SwipeInputHandler in Week 4
-    // public void SwipeLane(int dir)
-    // {
-    //     if (!IsRunning) return;
-    //     int newLane = Mathf.Clamp(currentLane + dir, 0, 2);
-    //     if (newLane != currentLane) { currentLane = newLane; targetX = (currentLane - 1) * laneWidth; }
-    // }
 
-    // public void SwipeJump()
-    // {
-    //     if (!IsRunning || !cc.isGrounded) return;
-    //     verticalVelocity = jumpForce;
-    // }
 
-    // public void SwipeSlide()
-    // {
-    //     if (!IsRunning || !cc.isGrounded || isSliding) return;
-    //     StartSlide();
-    // }
-	
-		// ─── Called by SwipeInputHandler (Android) ──────────────────
-
-	/// <summary>Swipe left (dir=-1) or right (dir=+1) to change lane.</summary>
 	public void SwipeLane(int dir)
 	{
 		if (!IsRunning) return;
@@ -276,7 +217,7 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-	/// <summary>Swipe up — jump.</summary>
+
 	public void SwipeJump()
 	{
 		if (!IsRunning) return;
@@ -284,7 +225,7 @@ public class PlayerController : MonoBehaviour
 			verticalVelocity = jumpForce;
 	}
 
-	/// <summary>Swipe down — slide.</summary>
+
 	public void SwipeSlide()
 	{
 		if (!IsRunning) return;

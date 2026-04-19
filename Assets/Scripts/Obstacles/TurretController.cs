@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Wall-mounted turret. Tracks CIPHER and fires.
-/// Detection: distance-based (no trigger sphere needed).
-/// Firing: instant raycast + brief LineRenderer flash for visibility.
-/// </summary>
+
+
+
+
+
 public class TurretController : MonoBehaviour
 {
     [Header("References")]
@@ -14,22 +14,22 @@ public class TurretController : MonoBehaviour
     public Transform muzzle;
 
     [Header("Settings")]
-    public float detectionRange  = 14f;   // increased from 12 — gives more fire time
+    public float detectionRange  = 14f;   
     public float fireInterval    = 1.2f;
-    public float rotationSpeed   = 12f;   // increased from 3 — now actually tracks CIPHER
+    public float rotationSpeed   = 12f;   
     public int   damage          = 20;
 
     [Header("Laser Flash VFX")]
     [Tooltip("Duration in seconds the laser line is visible after each shot.")]
     public float laserFlashDuration = 0.12f;
 
-    // Runtime
+    
     private Transform player;
     private float     fireTimer;
     private bool      isDisabled;
     private LineRenderer laserLine;
 
-    // ─────────────────────────────────────────────
+    
 
     void Start()
     {
@@ -38,8 +38,23 @@ public class TurretController : MonoBehaviour
             Debug.LogWarning("[TurretController] No Player tag found.");
 
         fireTimer = Random.Range(0f, fireInterval);
+		
+		
+		if (DifficultyManager.Instance != null)
+		{
+			rotationSpeed = DifficultyManager.Instance.TurretRotationSpeed;
+			fireInterval  = DifficultyManager.Instance.TurretFireInterval;
 
-        // Add LineRenderer for visible laser shot
+			
+			float mountY = DifficultyManager.Instance.TurretMountHeight;
+			transform.localPosition = new Vector3(
+				transform.localPosition.x,
+				mountY,
+				transform.localPosition.z
+			);
+		}
+
+        
         laserLine = gameObject.AddComponent<LineRenderer>();
         laserLine.positionCount    = 2;
         laserLine.startWidth       = 0.03f;
@@ -48,11 +63,11 @@ public class TurretController : MonoBehaviour
         laserLine.enabled          = false;
         laserLine.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 
-        // Assign material — use the same laser beam material if it exists
+        
         Material laserMat = Resources.Load<Material>("Mat_LaserBeam");
         if (laserMat == null)
         {
-            // Create a fallback emissive material
+            
             laserMat = new Material(Shader.Find("Standard"));
             laserMat.color = new Color(1f, 0.2f, 0f);
             laserMat.EnableKeyword("_EMISSION");
@@ -96,11 +111,12 @@ public class TurretController : MonoBehaviour
         Vector3 fireDir = (player.position - muzzle.position).normalized;
         Ray ray = new Ray(muzzle.position, fireDir);
 
-        // Show laser flash
+        
         StartCoroutine(ShowLaserFlash(muzzle.position,
             muzzle.position + fireDir * detectionRange));
 
-        if (Physics.Raycast(ray, out RaycastHit hit, detectionRange))
+        
+		if (Physics.Raycast(muzzle.position, fireDir, out RaycastHit hit, detectionRange))
         {
             if (hit.collider.CompareTag("Player"))
             {
@@ -121,10 +137,18 @@ public class TurretController : MonoBehaviour
 
     public void Disable(float duration) => StartCoroutine(DisableCoroutine(duration));
 
-    IEnumerator DisableCoroutine(float dur)
+    IEnumerator DisableCoroutine(float duration)
     {
         isDisabled = true;
-        yield return new WaitForSeconds(dur);
+        if (turretHead != null) turretHead.gameObject.SetActive(false);
+        yield return new WaitForSeconds(duration);
         isDisabled = false;
+        if (turretHead != null) turretHead.gameObject.SetActive(true);
+    }
+	
+	
+    public void ApplyStealthModifier()
+    {
+        rotationSpeed = Mathf.Max(rotationSpeed - 4f, 2f);
     }
 }

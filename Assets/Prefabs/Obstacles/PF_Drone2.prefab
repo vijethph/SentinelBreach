@@ -73,6 +73,9 @@ MonoBehaviour:
   bobFrequency: 2
   damage: 15
   damageCooldown: 1
+  projectilePrefab: {fileID: 8576719504682017865, guid: 5fa0ee15b68fb0641b6dc1efd5cd2c07, type: 3}
+  fireInterval: 2.5
+  firesAtLevel: 3
 --- !u!1001 &9023473729303799210
 PrefabInstance:
   m_ObjectHideFlags: 0

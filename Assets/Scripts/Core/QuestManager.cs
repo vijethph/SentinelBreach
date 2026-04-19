@@ -7,13 +7,13 @@ public class QuestManager : MonoBehaviour
 {
     public static QuestManager Instance { get; private set; }
 
-    // ⚠️ Use Awake for singleton + quest selection so QuestUI.Start() can safely read quests
+    
     void Awake()
     {
         if (Instance == null) Instance = this;
         else { Destroy(gameObject); return; }
 
-        // Select quests in Awake so they are ready before any Start() runs
+        
         SelectQuests();
     }
 
@@ -27,14 +27,14 @@ public class QuestManager : MonoBehaviour
     private int[]        progress;
     private bool[]       completed;
 
-    public event Action<int>         OnQuestCompleted;    // passes XP reward
-    public event Action<int,int,int> OnProgressUpdated;   // (questSlot, current, target)
+    public event Action<int>         OnQuestCompleted;    
+    public event Action<int,int,int> OnProgressUpdated;   
 
     private PlayerController   playerController;
     private CollectibleManager collectibleManager;
 
-    // No-damage tracking — properly managed
-    private float lastDamageZ   = 0f;   // the Z distance when damage was last taken
+    
+    private float lastDamageZ   = 0f;   
     private bool  hasTakenDamage = false;
 
     void Start()
@@ -43,7 +43,7 @@ public class QuestManager : MonoBehaviour
         collectibleManager = CollectibleManager.Instance;
         SubscribeToEvents();
 
-        // Initialise no-damage baseline
+        
         lastDamageZ = playerController != null ? playerController.DistanceRun : 0f;
     }
 
@@ -56,7 +56,7 @@ public class QuestManager : MonoBehaviour
         }
 
         List<QuestData> pool = new List<QuestData>(allQuests);
-        // Fisher-Yates shuffle
+        
         for (int i = pool.Count - 1; i > 0; i--)
         {
             int j = UnityEngine.Random.Range(0, i + 1);
@@ -97,7 +97,7 @@ public class QuestManager : MonoBehaviour
             switch (q.questType)
             {
                 case QuestType.ReachDistance:
-                    // Update progress every frame so bar fills in real-time
+                    
                     int currentDist = (int)dist;
                     if (currentDist != progress[i])
                     {
@@ -108,7 +108,7 @@ public class QuestManager : MonoBehaviour
                     break;
 
                 case QuestType.TakeDamage:
-                    // Measures the longest no-damage stretch
+                    
                     if (!hasTakenDamage)
                     {
                         int stretch = (int)(dist - lastDamageZ);
@@ -122,39 +122,39 @@ public class QuestManager : MonoBehaviour
                     break;
 
                 case QuestType.ReachExfil:
-                    // Driven by NotifyExfilReached()
+                    
                     break;
             }
         }
 
-        // Reset damage flag each frame after processing
+        
         hasTakenDamage = false;
     }
 
-    // ─── Public notification methods ──────────────────────────────
+    
 
-    /// <summary>Call from PlayerHealth.TakeDamage().</summary>
+    
     public void NotifyDamageTaken()
     {
         hasTakenDamage = true;
         if (playerController != null)
-            lastDamageZ = playerController.DistanceRun;  // reset the no-damage start point
+            lastDamageZ = playerController.DistanceRun;  
     }
 
-    /// <summary>Call from GadgetManager.Activate() after the switch statement.</summary>
+    
     public void NotifyGadgetUsed(string gadgetId)
     {
         if (gadgetId == "dash") IncrementQuests(QuestType.UseGadget, 1);
         if (gadgetId == "emp")  IncrementQuests(QuestType.UseEMPOnEnemies, 1);
     }
 
-    /// <summary>Call from ExfilCheckpoint.</summary>
+    
     public void NotifyExfilReached()
     {
         IncrementQuests(QuestType.ReachExfil, 1);
     }
 
-    // ─── Internal ────────────────────────────────────────────────
+    
 
     void IncrementQuests(QuestType type, int amount)
     {
@@ -182,7 +182,7 @@ public class QuestManager : MonoBehaviour
 		QuestPopup.Instance?.ShowCompletion(q);
     }
 
-    // ─── Getters for QuestUI ──────────────────────────────────────
+    
 
     public QuestData GetQuest(int slot)    => activeQuests != null && slot < activeQuests.Length ? activeQuests[slot] : null;
     public int       GetProgress(int slot) => progress != null && slot < progress.Length ? progress[slot] : 0;

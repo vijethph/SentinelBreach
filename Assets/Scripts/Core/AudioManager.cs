@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Singleton audio manager. Plays SFX via AudioSource.PlayOneShot to avoid conflicts.
-/// BGM pitch increases with SENTINEL tier.
-/// </summary>
+
+
+
+
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance { get; private set; }
@@ -38,11 +38,11 @@ public class AudioManager : MonoBehaviour
 
     void Start()
     {
-        // SFX source
+        
         sfxSource = gameObject.AddComponent<AudioSource>();
         sfxSource.playOnAwake = false;
 
-        // Music source (looping)
+        
         musicSource = gameObject.AddComponent<AudioSource>();
         musicSource.loop        = true;
         musicSource.playOnAwake = false;
@@ -55,7 +55,7 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    // ─── Public Play Methods ──────────────────────────────────────
+    
 
     public void PlayLaser()    => Play(sfxLaser);
     public void PlayHit()      => Play(sfxHit);
@@ -72,7 +72,7 @@ public class AudioManager : MonoBehaviour
         sfxSource.PlayOneShot(clip, sfxVolume);
     }
 
-    /// <summary>Called by SentinelManager.IncreaseTier() to ramp up BGM pitch.</summary>
+    
     public void IncreaseMusicPitch()
     {
         if (musicSource != null)

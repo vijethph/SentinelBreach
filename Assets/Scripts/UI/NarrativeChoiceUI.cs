@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Shows the narrative choice popup when CIPHER reaches a terminal.
-/// Pauses the game (timeScale 0) while the player chooses.
-/// Auto-dismisses if no input for 5 seconds (defaults to Stealth).
-/// </summary>
+
+
+
+
+
 public class NarrativeChoiceUI : MonoBehaviour
 {
     public static NarrativeChoiceUI Instance { get; private set; }
@@ -25,12 +25,12 @@ public class NarrativeChoiceUI : MonoBehaviour
 
     private Coroutine timeoutCoroutine;
 
-    /// <summary>Called by TerminalTrigger when CIPHER enters a terminal zone.</summary>
+    
     public void ShowChoice()
     {
         if (choicePanel == null) return;
         choicePanel.SetActive(true);
-        Time.timeScale = 0f;   // freeze gameplay while player reads
+        Time.timeScale = 0f;   
 
         if (timeoutCoroutine != null) StopCoroutine(timeoutCoroutine);
         timeoutCoroutine = StartCoroutine(AutoChoiceAfterTimeout());
@@ -39,7 +39,7 @@ public class NarrativeChoiceUI : MonoBehaviour
     IEnumerator AutoChoiceAfterTimeout()
     {
         yield return new WaitForSecondsRealtime(autoChoiceTimeout);
-        // Default to stealth if player doesn't respond
+        
         OnStealthChosen();
     }
 

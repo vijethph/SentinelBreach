@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   segmentPrefab: {fileID: 6123985111690105267, guid: db5eabd93c4a58242a106be32cdf3a18, type: 3}
   spawnWeight: 40
-  minDistance: 100
+  minDistance: 30
   minSentinelTier: 1

@@ -33,21 +33,21 @@ public class CollectibleManager : MonoBehaviour
 				PlayerPrefs.Save();
 
                 OnShardCollected?.Invoke(TotalShards);
-				AudioManager.Instance?.PlayShard();    // ← ADD THIS
+				AudioManager.Instance?.PlayShard();    
                 break;
             case CollectibleType.ShieldCell:
-                // Activate the visible shield sphere and grant invincibility
+                
 				ShieldEffect shieldEffect = player.GetComponent<ShieldEffect>();
 				if (shieldEffect != null)
 					shieldEffect.ActivateShield();
 				else
-					ph?.SetInvincible(true, 5f);  // fallback if ShieldEffect not found
+					ph?.SetInvincible(true, 5f);  
 
 				OnShieldCollected?.Invoke();
 				Debug.Log("[Collectible] Shield Cell collected — shield activated.");
 				break;
             case CollectibleType.SurgeToken:
-                // Gradually refills all gadget cooldowns over 3 seconds
+                
 				GadgetManager.Instance?.StartSurgeRefill(3f);
 				OnSurgeCollected?.Invoke();
 				Debug.Log("[Collectible] Surge Token collected — gadget cooldowns refilling.");
@@ -60,7 +60,7 @@ public class CollectibleManager : MonoBehaviour
         }
     }
 	
-	/// <summary>Awards bonus shards from narrative choice, updates HUD.</summary>
+	
 	public void NotifyBonusShards(int amount)
 	{
 		TotalShards += amount;
