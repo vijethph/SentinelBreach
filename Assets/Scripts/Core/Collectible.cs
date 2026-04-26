@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum CollectibleType { DataShard, ShieldCell, SurgeToken, GhostChip }
+public enum CollectibleType { DataShard, ShieldCell, SurgeToken, GhostChip, InvertChip }
 
 public class Collectible : MonoBehaviour
 {

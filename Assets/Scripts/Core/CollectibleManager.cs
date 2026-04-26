@@ -57,6 +57,11 @@ public class CollectibleManager : MonoBehaviour
 				OnGhostChipCollected?.Invoke();
 				Debug.Log("[Collectible] Ghost Chip collected — ghost mode active.");
 				break;
+				
+			case CollectibleType.InvertChip:
+				GravityInversion.Instance?.Activate();
+				Debug.Log("[Collectible] Invert Chip collected — gravity reversing.");
+				break;
         }
     }
 	

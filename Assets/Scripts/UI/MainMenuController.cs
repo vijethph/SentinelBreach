@@ -9,6 +9,7 @@ public class MainMenuController : MonoBehaviour
 {
     [Header("UI References")]
     public TextMeshProUGUI levelBadgeText;
+	public GameObject mainButtonsPanel;
     public GameObject skillTreePanel;   
 	
 	[Header("XP Bar")]
@@ -17,6 +18,8 @@ public class MainMenuController : MonoBehaviour
 
     void Start()
     {
+		if (mainButtonsPanel != null) mainButtonsPanel.SetActive(true);
+		if (skillTreePanel   != null) skillTreePanel.SetActive(false);
         int level   = PlayerPrefs.GetInt("CipherLevel", 1);
 		int totalXP = PlayerPrefs.GetInt("CipherXP", 0);
 
@@ -45,6 +48,7 @@ public class MainMenuController : MonoBehaviour
     {
         if (skillTreePanel != null)
             skillTreePanel.SetActive(true);
+		if (mainButtonsPanel != null) mainButtonsPanel.SetActive(false);
     }
 
     public void OnQuitPressed()
@@ -56,5 +60,6 @@ public class MainMenuController : MonoBehaviour
     {
         if (skillTreePanel != null)
             skillTreePanel.SetActive(false);
+		if (mainButtonsPanel != null) mainButtonsPanel.SetActive(true);
     }
 }

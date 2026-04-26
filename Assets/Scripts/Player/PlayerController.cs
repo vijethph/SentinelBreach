@@ -9,8 +9,9 @@ public class PlayerController : MonoBehaviour
     public float runSpeed = 8f;
     public float laneWidth = 2.0f;
     public float laneSwitchSpeed = 10f;
+	private float gravityEffective;
 
-    [Header("Custom Gravity & Jump — Student-Written Physics")]
+    [Header("Custom Gravity & Jump")]
     [Tooltip("Gravity constant. Negative = downward. NOT Physics.gravity.")]
     public float gravity = -25f;
 
@@ -44,6 +45,10 @@ public class PlayerController : MonoBehaviour
 	public float slideSpeedBoost = 3f;
 	public float slideDrag       = 4f;
 	private float slideExtraSpeed = 0f;
+	
+	[Header("Corridor Bounds")]
+	[Tooltip("World Y of the ceiling face. Must match the segment prefab ceiling height.")]
+	public float corridorCeiling = 3.85f; 
 
     public float DistanceRun { get; private set; } = 0f;
     public bool IsRunning { get; private set; } = true;
@@ -54,6 +59,8 @@ public class PlayerController : MonoBehaviour
 		cc = GetComponent<CharacterController>();
 		currentLane = 1;
 		targetX = 0f;
+		gravityEffective = gravity;   
+		
 		cc.height = normalHeight;
 		cc.center = new Vector3(0f, normalHeight / 2f, 0f);
 
@@ -166,7 +173,15 @@ public class PlayerController : MonoBehaviour
         move.x = (newX - currentX) / Time.deltaTime;
 
         if (!cc.isGrounded)
-            verticalVelocity += gravity * Time.deltaTime;
+		{
+			gravityEffective = (GravityInversion.Instance != null && GravityInversion.Instance.IsInverted)
+				? Mathf.Abs(gravity)     // positive → accelerates upward
+				: gravity;               // negative → accelerates downward (normal)
+
+			verticalVelocity += gravityEffective * Time.deltaTime;
+			// verticalVelocity += gravity * Time.deltaTime;
+		}
+            
         else if (verticalVelocity < 0f)
 			verticalVelocity = -2f;
 
@@ -182,6 +197,20 @@ public class PlayerController : MonoBehaviour
         cc.Move(move * Time.deltaTime);
 
 		move.z = effectiveSpeed;
+		
+		// ── Inverted grounding: clamp CIPHER to ceiling when inverted ────
+		if (GravityInversion.Instance != null && GravityInversion.Instance.IsInverted)
+		{
+			// Corridor ceiling is at Y = corridorHeight (default 4.0).
+			// When inverted, treat ceiling contact as "grounded".
+			// CharacterController handles this via its collider — no manual clamp needed
+			// as long as the ceiling has a MeshCollider or plain Cube collider.
+			// Reset vertical velocity on ceiling contact (mirrors the floor grounded reset).
+			if (transform.position.y >= corridorCeiling - 0.05f)
+			{
+				verticalVelocity = 0f;
+			}
+		}
     }
 
     void TrackDistance()
@@ -231,5 +260,17 @@ public class PlayerController : MonoBehaviour
 		if (!IsRunning) return;
 		if (cc.isGrounded && !isSliding)
 			StartSlide();
+	}
+	
+	/// <summary>
+	/// Called by GravityInversion to flip the effective gravity direction.
+	/// Also resets verticalVelocity to give CIPHER an initial push toward the new surface.
+	/// </summary>
+	public void SetGravityInverted(bool inverted)
+	{
+		// Give a small initial impulse so CIPHER starts moving toward the new surface
+		// rather than waiting for gravity alone to accelerate it.
+		verticalVelocity = inverted ? Mathf.Abs(gravity) * 0.3f : gravity * 0.3f;
+		Debug.Log($"[PlayerController] Gravity inverted: {inverted}. Initial vel: {verticalVelocity:F2}");
 	}
 }

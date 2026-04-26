@@ -3,14 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-
-
-
-
-
-
-
-
 [RequireComponent(typeof(SphereCollider))]
 public class DroneProjectile : MonoBehaviour
 {
@@ -74,6 +66,9 @@ public class DroneProjectile : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         if (hasHit) return;
+		
+		if (other.CompareTag("Projectile")) return;
+		if (other.CompareTag("Enemy"))      return;
 
         if (other.CompareTag("Player"))
         {
@@ -81,12 +76,17 @@ public class DroneProjectile : MonoBehaviour
             other.GetComponent<PlayerHealth>()
                  ?.TakeDamage(damage, transform.position);
             Destroy(gameObject);
+			return;
         }
         else if (!other.CompareTag("Enemy") && !other.CompareTag("Projectile"))
         {
             
             hasHit = true;
             Destroy(gameObject);
-        }
+        } else if (!other.isTrigger)
+		{
+			hasHit = true;
+			Destroy(gameObject);
+		}
     }
 }
