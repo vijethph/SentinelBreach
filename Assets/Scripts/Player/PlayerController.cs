@@ -40,11 +40,16 @@ public class PlayerController : MonoBehaviour
 
     private bool isSliding = false;
     private float slideTimer = 0f;
+	private bool isJumping = false;
 
 	[Header("Slide Physics (student-written)")]
 	public float slideSpeedBoost = 3f;
 	public float slideDrag       = 4f;
 	private float slideExtraSpeed = 0f;
+	
+	[Header("Slide Resize Smoothing")]
+	public float slideResizeDuration = 0.10f;   // seconds to complete capsule resize
+	private Coroutine slideResizeCoroutine;
 	
 	[Header("Corridor Bounds")]
 	[Tooltip("World Y of the ceiling face. Must match the segment prefab ceiling height.")]
@@ -95,6 +100,15 @@ public class PlayerController : MonoBehaviour
         ApplyMovement();
         TrackDistance();
     }
+	
+	IEnumerator SmoothJumpCoroutine()
+	{
+		// Frame 1: apply 55% of jump force — feels more like a physical push-off
+		verticalVelocity = jumpForce * 0.55f;
+		yield return null;
+		// Frame 2: full force — two-frame ramp removes the instantaneous velocity pop
+		verticalVelocity = jumpForce;
+	}
 
     void HandleInput()
 	{
@@ -124,8 +138,11 @@ public class PlayerController : MonoBehaviour
 	void OnJump()
 	{
 		if (!IsRunning) return;
-		if (cc.isGrounded)
-			verticalVelocity = jumpForce;
+		if (cc.isGrounded && !isJumping)
+		{
+			isJumping = true;
+			StartCoroutine(SmoothJumpCoroutine());
+		}
 	}
 
 	void OnSlide()
@@ -134,14 +151,32 @@ public class PlayerController : MonoBehaviour
 		if (cc.isGrounded && !isSliding)
 			StartSlide();
 	}
+	
+	IEnumerator ResizeCapsule(float fromHeight, float toHeight, float duration)
+	{
+		float elapsed = 0f;
+		while (elapsed < duration)
+		{
+			elapsed += Time.deltaTime;
+			float t = Mathf.Clamp01(elapsed / duration);
+			// Smoothstep ease: t² (3 - 2t)
+			float tEased = t * t * (3f - 2f * t);
+			float h = Mathf.Lerp(fromHeight, toHeight, tEased);
+			cc.height = h;
+			cc.center = new Vector3(0f, h / 2f, 0f);
+			yield return null;
+		}
+		cc.height = toHeight;
+		cc.center = new Vector3(0f, toHeight / 2f, 0f);
+	}
 
     void StartSlide()
     {
         isSliding = true;
 		slideExtraSpeed = slideSpeedBoost;
         slideTimer = slideDuration;
-        cc.height = slideHeight;
-        cc.center = new Vector3(0f, slideHeight / 2f, 0f);
+        if (slideResizeCoroutine != null) StopCoroutine(slideResizeCoroutine);
+		slideResizeCoroutine = StartCoroutine(ResizeCapsule(normalHeight, slideHeight, slideResizeDuration));
     }
 
     void HandleSlide()
@@ -151,8 +186,8 @@ public class PlayerController : MonoBehaviour
         if (slideTimer <= 0f)
         {
             isSliding = false;
-            cc.height = normalHeight;
-            cc.center = new Vector3(0f, normalHeight / 2f, 0f);
+			if (slideResizeCoroutine != null) StopCoroutine(slideResizeCoroutine);
+			slideResizeCoroutine = StartCoroutine(ResizeCapsule(slideHeight, normalHeight, slideResizeDuration));
         }
     }
 
@@ -183,7 +218,13 @@ public class PlayerController : MonoBehaviour
 		}
             
         else if (verticalVelocity < 0f)
-			verticalVelocity = -2f;
+		{
+			// Smooth landing: Lerp toward the resting value rather than hard-clamping
+			verticalVelocity = Mathf.Lerp(verticalVelocity, -2f, 18f * Time.deltaTime);
+			if (Mathf.Abs(verticalVelocity - (-2f)) < 0.1f)
+				verticalVelocity = -2f;
+			isJumping = false;   // ← reset jump flag on grounded
+		}
 
         move.y = verticalVelocity;
 
@@ -250,8 +291,11 @@ public class PlayerController : MonoBehaviour
 	public void SwipeJump()
 	{
 		if (!IsRunning) return;
-		if (cc.isGrounded)
-			verticalVelocity = jumpForce;
+		if (cc.isGrounded && !isJumping)
+		{
+			isJumping = true;
+			StartCoroutine(SmoothJumpCoroutine());
+		}
 	}
 
 
